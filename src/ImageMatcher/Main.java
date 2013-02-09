@@ -12,16 +12,19 @@ public class Main {
 			try{
 				//Checks the input is properly formed
 				pa.checkParameters(args);
-
 			}
 			catch(Exception e){
 				System.out.println("ERROR - There was an error parsing the inputs \n" + e.toString());
 			}
 			
 			//Compare the patterns and images
-			StringComparator comp = new StringComparator();
+			ImageComparator comp = new ImageComparator();
+			
 			try{
-		//		comp.searchForPatterns(pa.getPattern(), pa.getSource());
+				//iterate through the list of Files 
+				//for each file in pattern
+				//for each file in source
+					//comp.compare(ImageHandler(patternImage), ImageHandler(sourceImage));
 			}
 			catch(Exception e){
 				System.out.println("ERROR - There was an error searching the source for patterns \n" + e.toString());

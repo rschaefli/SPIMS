@@ -7,9 +7,9 @@ package ImageMatcher;
  * @author ChrisA
  *
  */
-public abstract class Comparator {
+public interface Comparator {
 
-		abstract void searchForPatterns(String patterns, String source);
-		//abstract void compare(String pattern, String source);
+		//abstract void searchForPatterns(String patterns, String source);
+		public void compare(ImageHandler pattern, ImageHandler source);
 
 }
