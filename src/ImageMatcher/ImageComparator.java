@@ -109,8 +109,8 @@ public class ImageComparator implements Comparator
 		result.put("x", xs);
       
 		// Get the color values of pixels on the Y axis
-		// NOTE: origin 0,0 not included
-		for(int i=1;i<pixelsForYAxis;i++)
+		// NOTE: we are double checking 0,0 - shouldnt be much of an issue
+		for(int i=0;i<pixelsForYAxis;i++)
 		{
 			Color curPixel = new Color(image.getRGB(0, i));
 			ys.add(curPixel);
@@ -135,8 +135,8 @@ public class ImageComparator implements Comparator
 			{
 				// Make sure we arent too far down or too far to the right
 				// to find a complete pattern image
-				if(i < (sourceImage.getWidth() - patternImage.getWidth()) &&
-				   j < (sourceImage.getHeight() - patternImage.getHeight()))
+				if(i <= (sourceImage.getWidth() - patternImage.getWidth()) &&
+				   j <= (sourceImage.getHeight() - patternImage.getHeight()))
 				{
 					boolean isPotentialMatch = true;
 					int badPixels = 0;
@@ -161,11 +161,11 @@ public class ImageComparator implements Comparator
 
 					// Check all the Y pixels to see if this subimage might be a match
 					badPixels = 0;
-					for(int y=1;y<yPixels.size()-1;y++)
+					for(int y=0;y<yPixels.size()-1;y++)
 					{
 						Color pixelToCompare = new Color(sourceImage.getRGB(i, j + y));
                     
-						if(!isColorCloseTo(yPixels.get(y-1), pixelToCompare, errorMargin))
+						if(!isColorCloseTo(yPixels.get(y), pixelToCompare, errorMargin))
 						{
 							badPixels++;
 						}

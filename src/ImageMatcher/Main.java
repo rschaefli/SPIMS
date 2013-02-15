@@ -20,13 +20,10 @@ public class Main
 	// This quality loss may well be the issues and a conversion to the lowest quality denominator
 	// might solve the issues
 	
-	// No match for 9. This was working earlier, not sure what happened.
-	// Changed something so matches at 0,0 (entire pattern in source) aren't working
-	
 	public static void main(String[] args)
 	{
-        File file = new File("C:\\Patterns\\morning.png");
-        File file2 = new File("C:\\Sources\\ak432.png");
+        File file = new File("C:\\Patterns\\flower.gif");
+        File file2 = new File("C:\\Sources\\ac1000.jpg");
 
 		// Check the parameters and load them into the parameter object
 //		ParameterHandler pa = new ParameterHandler();
