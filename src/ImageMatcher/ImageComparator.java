@@ -63,60 +63,54 @@ public class ImageComparator implements Comparator
 		ArrayList<Color> yPixels = patternImageAxisColors.get("y");
 		int offPixelsToAllow = 5;
 		
-		for(int i=0; i<sourceImage.getWidth(); i++)
+		for(int i=0; i<=sourceImage.getWidth()-patternImage.getWidth(); i++)
 		{
-			for(int j=0; j<sourceImage.getHeight(); j++)
+			for(int j=0; j<=sourceImage.getHeight()-patternImage.getHeight(); j++)
 			{
-				// Make sure we arent too far down or too far to the right
-				// to find a complete pattern image
-				if(i <= (sourceImage.getWidth() - patternImage.getWidth()) &&
-				   j <= (sourceImage.getHeight() - patternImage.getHeight()))
+				boolean isPotentialMatch = true;
+				int offPixelCount = 0;
+
+				// Check all the X pixels to see if this subimage might be a match
+				for(int x=0;x<xPixels.size()-1;x++)
 				{
-					boolean isPotentialMatch = true;
-					int offPixelCount = 0;
-
-					// Check all the X pixels to see if this subimage might be a match
-					for(int x=0;x<xPixels.size()-1;x++)
+					Color pixelToCompare = new Color(sourceImage.getRGB(i+x, j));
+                
+					if(!isColorCloseTo(xPixels.get(x), pixelToCompare, errorMargin))
 					{
-						Color pixelToCompare = new Color(sourceImage.getRGB(i+x, j));
-                    
-						if(!isColorCloseTo(xPixels.get(x), pixelToCompare, errorMargin))
-						{
-							offPixelCount++;
-						}
-
-						isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
-
-						if(!isPotentialMatch)
-						{
-							break;
-						}
+						offPixelCount++;
 					}
 
-					// Check all the Y pixels to see if this subimage might be a match
-					offPixelCount = 0;
-					for(int y=0;y<yPixels.size()-1;y++)
-					{
-						Color pixelToCompare = new Color(sourceImage.getRGB(i, j + y));
-                    
-						if(!isColorCloseTo(yPixels.get(y), pixelToCompare, errorMargin))
-						{
-							offPixelCount++;
-						}
+					isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
 
-						isPotentialMatch = isPotentialMatch && (offPixelCount < 5) ;
-						
-						if(!isPotentialMatch)
-						{
-							break;
-						}
+					if(!isPotentialMatch)
+					{
+						break;
+					}
+				}
+
+				// Check all the Y pixels to see if this subimage might be a match
+				offPixelCount = 0;
+				for(int y=0;y<yPixels.size()-1;y++)
+				{
+					Color pixelToCompare = new Color(sourceImage.getRGB(i, j + y));
+                
+					if(!isColorCloseTo(yPixels.get(y), pixelToCompare, errorMargin))
+					{
+						offPixelCount++;
 					}
 
-					// If we have a potential match, add origin to result
-					if(isPotentialMatch)
+					isPotentialMatch = isPotentialMatch && (offPixelCount < 5) ;
+					
+					if(!isPotentialMatch)
 					{
-						possibleCorners.add(new Point(i, j));
+						break;
 					}
+				}
+
+				// If we have a potential match, add origin to result
+				if(isPotentialMatch)
+				{
+					possibleCorners.add(new Point(i, j));
 				}
 			}
 		}
