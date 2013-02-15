@@ -7,17 +7,29 @@ public class Main
 	// TEST RUNS:
 	// 4th comparison - flower.gif to ac1000.jpg fails
 	// Might have to do with quality, not sure
+    
+        // 1 (black.jpg, bb0001.jpg took 5 seconds, correct location)
+    
+        // 3 (cliff.png, an0300.jpg took 4 seconds, correct location)
+    
+        // 4 (flower.gif, ac1000.jpg took 6 seconds, location slightly wrong)
+    
+        // 5 (nature.jpg, hh0021.jpg took 4 seconds, correct location)
 	
-	// 6 (rock.jpg, ar0800.jpg) took 20 seconds
+	// 6 (rock.jpg, ar0800.jpg) took 4 seconds, correct location)
 	
-	// 7 (tree.jpg, aa0010.jpg) took 6 seconds
+	// 7 (tree.jpg, aa0010.jpg) took 6 seconds, correct location)
+    
+    
+    
+    
 	
 	// For everything else a match was detected at the correct top left location
 	
 	public static void main(String[] args)
 	{
-        File file = new File("C:\\Patterns\\flower.gif");
-        File file2 = new File("C:\\Sources\\ac1000.jpg");
+        File file = new File("C:\\Patterns\\ranch.jpg");
+        File file2 = new File("C:\\Sources\\ai0059.gif");
 
 		// Check the parameters and load them into the parameter object
 //		ParameterHandler pa = new ParameterHandler();

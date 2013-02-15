@@ -22,7 +22,8 @@ import javax.imageio.stream.ImageInputStream;
 public class ImageHandler{
 	
 	private BufferedImage image = null;     // Handled Image
-	private boolean validImg = false;       // Is Handled Image Valid?
+	private String imageType = "";
+        private boolean validImg = false;       // Is Handled Image Valid?
 	
 	// List of valid image types (MUST BE LOWERCASE!)
 	private ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
@@ -56,7 +57,8 @@ public class ImageHandler{
 
 				// Validate reader type
 				if(VALID_TYPES.contains(fileType)) {
-					image = reader.read(0);				
+					image = reader.read(0);	
+                                        imageType = fileType;
 					validImg = true;
 				} else {
 					System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
@@ -98,18 +100,22 @@ public class ImageHandler{
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
+        
+        public String getImageType(){
+            return imageType;
+        }
 
 	/**
 	 * FOR TESTING PURPOSES, CAN REMOVE AT ANY TIME
 	 *  
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		File file = new File(args[0]);
-		ImageHandler handler = new ImageHandler(file);
-		if(handler.isValidImg()) {
-			BufferedImage img = handler.getImage();
-			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
-		}
-	}
+//	public static void main(String[] args) {
+//		File file = new File(args[0]);
+//		ImageHandler handler = new ImageHandler(file);
+//		if(handler.isValidImg()) {
+//			BufferedImage img = handler.getImage();
+//			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
+//		}
+//	}
 }
