@@ -14,11 +14,8 @@ public class ImageComparator implements Comparator
 	public ImageComparator() {}
 	
 	@Override
-	public void compare(ImageHandler patternHandler, ImageHandler sourceHandler)
+	public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) 
 	{
-		int patternWidth = patternHandler.getImage().getWidth();
-        int patternHeight = patternHandler.getImage().getHeight();
-        
         ImagePHash imageHash = new ImagePHash();
         String patternHash = "";
         try
@@ -36,11 +33,13 @@ public class ImageComparator implements Comparator
         
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceHandler.getImage(),
         													  possibleTopLeftCorners,
-        													  patternWidth,
-        													  patternHeight);
+        													  patternHandler.getImage().getWidth(),
+        													  patternHandler.getImage().getHeight());
         
+        // Get a map of Locations -> PHashes
+        // Compare each and check if we have a match at that location
         for(Entry<Point, String> entry : hashes.entrySet())
-        {
+        {       	
         	Point location = entry.getKey();
         	String subimageHash = entry.getValue();
         	int difference = getHammingDistance(patternHash, subimageHash);
@@ -62,6 +61,7 @@ public class ImageComparator implements Comparator
 		ArrayList<Point> possibleCorners = new ArrayList<Point>();
 		ArrayList<Color> xPixels = patternImageAxisColors.get("x");
 		ArrayList<Color> yPixels = patternImageAxisColors.get("y");
+		int offPixelsToAllow = 5;
 		
 		for(int i=0; i<sourceImage.getWidth(); i++)
 		{
@@ -73,7 +73,7 @@ public class ImageComparator implements Comparator
 				   j <= (sourceImage.getHeight() - patternImage.getHeight()))
 				{
 					boolean isPotentialMatch = true;
-					int badPixels = 0;
+					int offPixelCount = 0;
 
 					// Check all the X pixels to see if this subimage might be a match
 					for(int x=0;x<xPixels.size()-1;x++)
@@ -82,10 +82,10 @@ public class ImageComparator implements Comparator
                     
 						if(!isColorCloseTo(xPixels.get(x), pixelToCompare, errorMargin))
 						{
-							badPixels++;
+							offPixelCount++;
 						}
 
-						isPotentialMatch = isPotentialMatch && (badPixels < 5);
+						isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
 
 						if(!isPotentialMatch)
 						{
@@ -94,17 +94,17 @@ public class ImageComparator implements Comparator
 					}
 
 					// Check all the Y pixels to see if this subimage might be a match
-					badPixels = 0;
+					offPixelCount = 0;
 					for(int y=0;y<yPixels.size()-1;y++)
 					{
 						Color pixelToCompare = new Color(sourceImage.getRGB(i, j + y));
                     
 						if(!isColorCloseTo(yPixels.get(y), pixelToCompare, errorMargin))
 						{
-							badPixels++;
+							offPixelCount++;
 						}
 
-						isPotentialMatch = isPotentialMatch && (badPixels < 25) ;
+						isPotentialMatch = isPotentialMatch && (offPixelCount < 5) ;
 						
 						if(!isPotentialMatch)
 						{
