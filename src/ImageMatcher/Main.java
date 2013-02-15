@@ -17,8 +17,8 @@ public class Main
 	
 	// No match for 8
 	// Note that both 4 and 8 deal with gifs and jpgs for either the source or the pattern
-	// This quality loss may well be the issues and a conversion to the lowest quality denominator
-	// might solve the issues
+	// This quality loss may well be the issue and a conversion to the lowest quality denominator
+	// might solve it
 	
 	public static void main(String[] args)
 	{

@@ -33,6 +33,7 @@ public class ImageComparator implements Comparator
         ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners(sourceHandler.getImage(),
         																	 patternHandler.getImage(),
         																	 5);
+        
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceHandler.getImage(),
         													  possibleTopLeftCorners,
         													  patternWidth,
@@ -51,73 +52,6 @@ public class ImageComparator implements Comparator
         		System.out.println(location.y);
         	}
         }
-	}
-	
-	// Get the difference between 2 strings of equal length
-	public static int getHammingDistance(String one, String two)
-    {
-        if (one.length() != two.length())
-        {
-            return -1;
-        }
-        int counter = 0;
-        for (int i = 0; i < one.length(); i++)
-        {
-            if (one.charAt(i) != two.charAt(i)) counter++;
-        }
-        return counter;
-    }
-	
-	// Check if color c1s RGB values are all within errorMargin difference
-	// of c2s RGB values
-	public static Boolean isColorCloseTo(Color c1, Color c2, int errorMargin)
-	{
-		int c1Red = c1.getRed();
-      	int c2Red = c2.getRed();
-      	boolean isRedInRange = (c1Red >= c2Red - errorMargin) && (c1Red <= c2Red + errorMargin);
-      
-      	int c1Green = c1.getGreen();
-      	int c2Green = c2.getGreen();
-      	boolean isGreenInRange = (c1Green >= c2Green - errorMargin) && (c1Green <= c2Green + errorMargin);
-      
-      	int c1Blue = c1.getBlue();
-      	int c2Blue = c2.getBlue();
-      	boolean isBlueInRange = (c1Blue >= c2Blue - errorMargin) && (c1Blue <= c2Blue + errorMargin);
-      
-      	return (isRedInRange && isGreenInRange) || (isRedInRange && isBlueInRange) || (isGreenInRange && isBlueInRange);
-	}
-	
-	// Get howManyPerAxis pixels down the X and Y axis
-	// This is used to elaborate on just comparing the top left pixel of sub images
-	// The goal is to get less potential matches in the source image by checking more than 1 pixel
-	public static HashMap<String, ArrayList<Color>> getAxisColors(BufferedImage image, int howManyPerAxis)
-	{
-		HashMap<String, ArrayList<Color>> result = new HashMap<String, ArrayList<Color>>();
-		ArrayList<Color> xs = new ArrayList<Color>();
-		ArrayList<Color> ys = new ArrayList<Color>();
-		
-		// Get the number of pixels to get on the X and Y axis
-		int pixelsForXAxis = image.getWidth() > howManyPerAxis ? howManyPerAxis : image.getWidth();
-		int pixelsForYAxis = image.getHeight() > howManyPerAxis ? howManyPerAxis : image.getHeight();
-      
-		// Get the color values of pixels on the X axis
-		for(int i=0;i<pixelsForXAxis;i++)
-		{
-			Color curPixel = new Color(image.getRGB(i, 0));
-			xs.add(curPixel);
-		}
-		result.put("x", xs);
-      
-		// Get the color values of pixels on the Y axis
-		// NOTE: we are double checking 0,0 - shouldnt be much of an issue
-		for(int i=0;i<pixelsForYAxis;i++)
-		{
-			Color curPixel = new Color(image.getRGB(0, i));
-			ys.add(curPixel);
-		}
-		result.put("y", ys);
-     
-		return result;
 	}
 
 	// Works in conjunction with getAxisColors to determine if there are potential
@@ -189,7 +123,59 @@ public class ImageComparator implements Comparator
 		
 		return possibleCorners;
 	}
-  
+	
+	// Get howManyPerAxis pixels down the X and Y axis
+	// This is used to elaborate on just comparing the top left pixel of sub images
+	// The goal is to get less potential matches in the source image by checking more than 1 pixel
+	public static HashMap<String, ArrayList<Color>> getAxisColors(BufferedImage image, int howManyPerAxis)
+	{
+		HashMap<String, ArrayList<Color>> result = new HashMap<String, ArrayList<Color>>();
+		ArrayList<Color> xs = new ArrayList<Color>();
+		ArrayList<Color> ys = new ArrayList<Color>();
+		
+		// Get the number of pixels to get on the X and Y axis
+		int pixelsForXAxis = image.getWidth() > howManyPerAxis ? howManyPerAxis : image.getWidth();
+		int pixelsForYAxis = image.getHeight() > howManyPerAxis ? howManyPerAxis : image.getHeight();
+      
+		// Get the color values of pixels on the X axis
+		for(int i=0;i<pixelsForXAxis;i++)
+		{
+			Color curPixel = new Color(image.getRGB(i, 0));
+			xs.add(curPixel);
+		}
+		result.put("x", xs);
+      
+		// Get the color values of pixels on the Y axis
+		// NOTE: we are double checking 0,0 - shouldnt be much of an issue
+		for(int i=0;i<pixelsForYAxis;i++)
+		{
+			Color curPixel = new Color(image.getRGB(0, i));
+			ys.add(curPixel);
+		}
+		result.put("y", ys);
+     
+		return result;
+	}
+	
+	// Check if color c1s RGB values are all within errorMargin difference
+	// of c2s RGB values
+	public static Boolean isColorCloseTo(Color c1, Color c2, int errorMargin)
+	{
+		int c1Red = c1.getRed();
+      	int c2Red = c2.getRed();
+      	boolean isRedInRange = (c1Red >= c2Red - errorMargin) && (c1Red <= c2Red + errorMargin);
+      
+      	int c1Green = c1.getGreen();
+      	int c2Green = c2.getGreen();
+      	boolean isGreenInRange = (c1Green >= c2Green - errorMargin) && (c1Green <= c2Green + errorMargin);
+      
+      	int c1Blue = c1.getBlue();
+      	int c2Blue = c2.getBlue();
+      	boolean isBlueInRange = (c1Blue >= c2Blue - errorMargin) && (c1Blue <= c2Blue + errorMargin);
+      
+      	return (isRedInRange && isGreenInRange) || (isRedInRange && isBlueInRange) || (isGreenInRange && isBlueInRange);
+	}
+	
     public static String getPHashOfSubImage(BufferedImage sourceImage, Point location, int patternWidth, int patternHeight)
     {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
@@ -218,5 +204,20 @@ public class ImageComparator implements Comparator
         }
         
         return hashes;
+    }
+    
+ // Get the difference between 2 strings of equal length
+	public static int getHammingDistance(String one, String two)
+    {
+        if (one.length() != two.length())
+        {
+            return -1;
+        }
+        int counter = 0;
+        for (int i = 0; i < one.length(); i++)
+        {
+            if (one.charAt(i) != two.charAt(i)) counter++;
+        }
+        return counter;
     }
 }
