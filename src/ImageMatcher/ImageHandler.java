@@ -39,45 +39,43 @@ public class ImageHandler{
 	 * @param imageFile Image File
 	 */
 	public ImageHandler(File imageFile){
+		// Open Image Reading Streams
+		try {
+			FileInputStream	fis = new FileInputStream(imageFile);	
+			BufferedInputStream bis = new BufferedInputStream(fis);
+			ImageInputStream iis = ImageIO.createImageInputStream(bis);
+	
+			// Grab the appropriate image reader for the input stream
+			Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
+			
+			// If it is a support ImageIO reader type (JPEG, GIF, PNG, BMP, WBMP)
+			if(iter.hasNext()) {
+				ImageReader reader = (ImageReader) iter.next();
+				reader.setInput(iis);
+				String fileType = reader.getFormatName().toLowerCase();
 
-			// Open Image Reading Streams
-			try {
-				FileInputStream	fis = new FileInputStream(imageFile);	
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				ImageInputStream iis = ImageIO.createImageInputStream(bis);
-		
-				// Grab the appropriate image reader for the input stream
-				Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
-				
-				// If it is a support ImageIO reader type (JPEG, GIF, PNG, BMP, WBMP)
-				if(iter.hasNext()) {
-					ImageReader reader = (ImageReader) iter.next();
-					reader.setInput(iis);
-					String fileType = reader.getFormatName().toLowerCase();
-
-					// Validate reader type
-					if(VALID_TYPES.contains(fileType)) {
-						image = reader.read(0);				
-						validImg = true;
-					} else {
-						System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
-					}
+				// Validate reader type
+				if(VALID_TYPES.contains(fileType)) {
+					image = reader.read(0);				
+					validImg = true;
 				} else {
 					System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
 				}
-				
-				// Close the input streams
-				iis.close();
-				bis.close();
-				fis.close();
-			} catch (FileNotFoundException e) {
-				System.out.println("Unable to find file @ " + imageFile.getAbsolutePath());
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("Error reading file @ " + imageFile.getAbsolutePath());
-				e.printStackTrace();
+			} else {
+				System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
 			}
-
+			
+			// Close the input streams
+			iis.close();
+			bis.close();
+			fis.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Unable to find file @ " + imageFile.getAbsolutePath());
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Error reading file @ " + imageFile.getAbsolutePath());
+			e.printStackTrace();
+		}
 	}
 
 	/**

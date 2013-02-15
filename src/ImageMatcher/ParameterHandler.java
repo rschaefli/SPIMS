@@ -69,6 +69,5 @@ public class ParameterHandler {
 
 	public void setSources(List<File> sources) {
 		this.sources = sources;
-	}
-			
+	}		
 }
