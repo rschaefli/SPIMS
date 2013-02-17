@@ -136,15 +136,19 @@ public class ImageComparator implements Comparator {
     public static HashMap<Point, Color> getPixelColors(BufferedImage image, int step) {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
         
-        for (int j = 0; j < image.getHeight(); j++) {
-            for (int i = 0; i < image.getWidth(); i += step) {
+        mainloop:
+        for (int j = 0; j < image.getHeight() - 1; j++) {
+            for (int i = 0; i < image.getWidth() - 1; i += step) {
                 Point curLocation = new Point(i, j);
                 Color curPixel = new Color(image.getRGB(i, j));
 
                 result.put(curLocation, curPixel);
+
+                if (result.size() == step) {
+                    break mainloop;
+                }
             }
         }
-        
         return result;
     }
 
