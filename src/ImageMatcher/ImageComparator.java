@@ -70,7 +70,7 @@ public class ImageComparator implements Comparator {
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
     public static ArrayList<Point> findPossibleTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, int errorMargin) {
-        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, 20);
+        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, 30);
         ArrayList<Point> possibleCorners = new ArrayList<Point>();
         int offPixelsToAllow = 5;
 
@@ -108,57 +108,44 @@ public class ImageComparator implements Comparator {
     // Get howManyPerAxis pixels down the X and Y axis
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
-    public static HashMap<String, ArrayList<Color>> getAxisColors(BufferedImage image, int howManyPerAxis) {
-        HashMap<String, ArrayList<Color>> result = new HashMap<String, ArrayList<Color>>();
-        ArrayList<Color> xs = new ArrayList<Color>();
-        ArrayList<Color> ys = new ArrayList<Color>();
+    public static HashMap<Point, Color> getPixelColorsByAxis(BufferedImage image, int howManyPerAxis) {
+    	HashMap<Point, Color> result = new HashMap<Point, Color>();
 
-        // Get the number of pixels to get on the X and Y axis
+        // Bound the number of pixels to get on the X and Y axis
         int pixelsForXAxis = image.getWidth() > howManyPerAxis ? howManyPerAxis : image.getWidth();
         int pixelsForYAxis = image.getHeight() > howManyPerAxis ? howManyPerAxis : image.getHeight();
-        int pixelsForXYAxis = image.getHeight() > howManyPerAxis ? howManyPerAxis : image.getHeight();
 
         // Get the color values of pixels on the X axis
         for (int i = 0; i < pixelsForXAxis; i++) {
             Color curPixel = new Color(image.getRGB(i, 0));
-            xs.add(curPixel);
+            result.put(new Point(i,0), curPixel);
         }
-        result.put("x", xs);
 
         // Get the color values of pixels on the Y axis
         // NOTE: we are double checking 0,0 - shouldnt be much of an issue
         for (int i = 0; i < pixelsForYAxis; i++) {
             Color curPixel = new Color(image.getRGB(0, i));
-            ys.add(curPixel);
+            result.put(new Point(0,i), curPixel);
         }
-        result.put("y", ys);
 
         return result;
     }
-    // back on the left side of the second row.
+    
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
-
-    public static HashMap<Point, Color> getPixelColors(BufferedImage image, int howManyPerAxis) {
+    // back on the left side of the second row.
+    public static HashMap<Point, Color> getPixelColors(BufferedImage image, int step) {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
-        int spacesToSkip = 30;
-
-        // Get howManyPixels ammount of pixels. Start at the top left corner,
-        // skip every 30 pixels. Once at the right side of the first row, start
-
-        mainloop:
-        for (int j = 0; j < image.getHeight() - 1; j++) {
-            for (int i = 0; i < image.getWidth() - 1; i += spacesToSkip) {
+        
+        for (int j = 0; j < image.getHeight(); j++) {
+            for (int i = 0; i < image.getWidth(); i += step) {
                 Point curLocation = new Point(i, j);
                 Color curPixel = new Color(image.getRGB(i, j));
 
                 result.put(curLocation, curPixel);
-
-                if (result.size() == spacesToSkip) {
-                    break mainloop;
-                }
             }
         }
+        
         return result;
     }
 
@@ -181,7 +168,9 @@ public class ImageComparator implements Comparator {
         //(isRedInRange && isGreenInRange && isBlueInRange);
 
     }
-
+    
+    // Get a the PHash of a subimage with top left corner at location
+    // and a size of patternWidth x patternHeight
     public static String getPHashOfSubImage(BufferedImage sourceImage, Point location, int patternWidth, int patternHeight) {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
         ImagePHash imageHasher = new ImagePHash();
@@ -195,7 +184,9 @@ public class ImageComparator implements Comparator {
 
         return hash;
     }
-
+    
+    // Get the PHashes of from a list of locations representing the top left corners of
+    // potential matches within the source image
     public static HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations, int patternWidth, int patternHeight) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 

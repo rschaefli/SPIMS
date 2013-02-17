@@ -1,8 +1,6 @@
 package ImageMatcher;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // For everything else a match was detected at the correct top left location
 public class Main {
@@ -24,10 +22,10 @@ public class Main {
 		// Parameter Helper to help check inputs
 		ParameterHandler ph = new ParameterHandler();
 
-		// Check to make sure there is the correct ammount of arguments
+		// Check to make sure there is the correct amount of arguments
 		// and the correct flags
 		try {
-			Boolean correctArguments = ph.checkAllFlagsExist(args);
+			ph.checkAllFlagsExist(args);
 		} catch (Exception ex) {
 			System.out.println(ex);
 			System.exit(1);
