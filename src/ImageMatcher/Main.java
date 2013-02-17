@@ -39,8 +39,7 @@ public class Main {
 			String[] patterns = pFile.list();
 			for (String p : patterns) {
 
-				ImageHandler pattern = new ImageHandler(new File(
-						pFile.getAbsolutePath() + File.separatorChar + p));
+				ImageHandler pattern = new ImageHandler(new File(pFile.getAbsolutePath() + File.separatorChar + p));
 
 				if (sFile.isDirectory()) {
 					String[] sources = sFile.list();

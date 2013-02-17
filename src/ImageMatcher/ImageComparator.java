@@ -59,10 +59,11 @@ public class ImageComparator implements Comparator {
         }
 
         if (locationOfLowestMatch != null && lowestDifference < 15) {
-            System.out.println(patternHandler.getName() + " matches "
-                    + sourceHandler.getName() + " at "
-                    + patternHandler.getWidth() + "x" + patternHandler.getHeight()
-                    + "+" + Integer.toString(locationOfLowestMatch.x) + "+" + Integer.toString(locationOfLowestMatch.y));
+            System.out.println(patternHandler.getName() + " matches " +
+            				   sourceHandler.getName() + " at " +
+            				   patternHandler.getWidth() + "x" + patternHandler.getHeight() +
+            				   "+" + Integer.toString(locationOfLowestMatch.x) +
+            				   "+" + Integer.toString(locationOfLowestMatch.y));
         }
 
     }
@@ -84,7 +85,6 @@ public class ImageComparator implements Comparator {
                     Point p = entry.getKey();
                     Color patternPixelColor = entry.getValue();
 
-
                     Color sourcePixelColor = new Color(sourceImage.getRGB(i + p.x, j + p.y));
 
                     if (!isColorCloseTo(patternPixelColor, sourcePixelColor, errorMargin)) {
@@ -92,7 +92,6 @@ public class ImageComparator implements Comparator {
                     }
 
                     isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
-
                 }
 
                 // If we have a potential match, add origin to result
