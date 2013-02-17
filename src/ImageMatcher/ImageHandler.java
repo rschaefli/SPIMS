@@ -16,36 +16,43 @@ import javax.imageio.stream.ImageInputStream;
 
 /**
  * Handles File to BufferedImage validation and conversion
- * 
+ *
  * @author RobToombs
  *
  */
-public class ImageHandler{
+public class ImageHandler {
 
 	private BufferedImage image = null;     // Handled Image
 	private boolean validImg = false;       // Is Handled Image Valid?
 	private FILE_TYPE type = null;
+	private int width;
+	private int height;
+	private String name;
 
-	public static enum FILE_TYPE {JPEG, GIF, PNG};
+	public static enum FILE_TYPE {
 
+		JPEG, GIF, PNG
+	};
 	// List of valid image types (MUST BE LOWERCASE!)
-	private HashMap<String, FILE_TYPE> FILE_TYPE_HASH = new HashMap<String, FILE_TYPE>() {{
-		put("jpeg", FILE_TYPE.JPEG);
-		put("png", FILE_TYPE.PNG);
-		put("gif", FILE_TYPE.GIF);
-	}};
+	private HashMap<String, FILE_TYPE> FILE_TYPE_HASH = new HashMap<String, FILE_TYPE>() {
+		{
+			put("jpeg", FILE_TYPE.JPEG);
+			put("png", FILE_TYPE.PNG);
+			put("gif", FILE_TYPE.GIF);
+		}
+	};
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * Handles File Validation/Initializes Buffered Image
-	 *  
+	 *
 	 * @param imageFile Image File
 	 */
-	public ImageHandler(File imageFile){
+	public ImageHandler(File imageFile) {
 		// Open Image Reading Streams
 		try {
-			FileInputStream	fis = new FileInputStream(imageFile);	
+			FileInputStream fis = new FileInputStream(imageFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			ImageInputStream iis = ImageIO.createImageInputStream(bis);
 
@@ -53,14 +60,17 @@ public class ImageHandler{
 			Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
 
 			// If it is a support ImageIO reader type (JPEG, GIF, PNG, BMP, WBMP)
-			if(iter.hasNext()) {
+			if (iter.hasNext()) {
 				ImageReader reader = (ImageReader) iter.next();
 				reader.setInput(iis);
 				String fileType = reader.getFormatName().toLowerCase();
 
 				// Validate reader type
-				if(FILE_TYPE_HASH.keySet().contains(fileType)) {
-					image = reader.read(0);	
+				if (FILE_TYPE_HASH.keySet().contains(fileType)) {
+					image = reader.read(0);
+					width = image.getWidth();
+					height = image.getHeight();
+					name = imageFile.getName();
 					validImg = true;
 					type = FILE_TYPE_HASH.get(fileType);
 				} else {
@@ -84,8 +94,9 @@ public class ImageHandler{
 	}
 
 	/**
-	 * Use this to verify that the image being handled is existent/valid before using it
-	 * 
+	 * Use this to verify that the image being handled is existent/valid before
+	 * using it
+	 *
 	 * @return Does this image handle contain a valid image?
 	 */
 	public boolean isValidImg() {
@@ -112,17 +123,16 @@ public class ImageHandler{
 		this.type = type;
 	}
 
-	/**
-	 * FOR TESTING PURPOSES, CAN REMOVE AT ANY TIME
-	 *  
-	 * @param args
-	 */
-	//	public static void main(String[] args) {
-	//		File file = new File(args[0]);
-	//		ImageHandler handler = new ImageHandler(file);
-	//		if(handler.isValidImg()) {
-	//			BufferedImage img = handler.getImage();
-	//			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
-	//		}
-	//	}
+	public int getHeight() {
+		return height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public String getName() {
+		return name;
+	}
 }
+
