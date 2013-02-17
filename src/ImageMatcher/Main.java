@@ -34,46 +34,48 @@ public class Main {
 		ImageComparator comp = new ImageComparator();
 		File pFile = new File(args[1]);
 		File sFile = new File(args[3]);
-
-		if (pFile.isDirectory()) {
-			String[] patterns = pFile.list();
-			for (String p : patterns) {
-
-				ImageHandler pattern = new ImageHandler(new File(pFile.getAbsolutePath() + File.separatorChar + p));
-
-				if (sFile.isDirectory()) {
-					String[] sources = sFile.list();
-					for (String s : sources) {
-
-						ImageHandler source = new ImageHandler(new File(
-								sFile.getAbsolutePath() + File.separatorChar
-								+ s));
-						comp.compare(pattern, source);
-
-					}
-
-				} else {
-					ImageHandler source = new ImageHandler(sFile);
-					comp.compare(pattern, source);
-				}
+		String[] patterns = new String[1];
+		String[] sources = new String[1];
+		
+		// Get a list of pattern files
+		if(pFile.isDirectory())
+		{
+			patterns = pFile.list();
+			for(int i=0; i<patterns.length; i++)
+			{
+				patterns[i] = pFile.getAbsolutePath() + File.separatorChar + patterns[i];
 			}
-		} else {
-			ImageHandler pattern = new ImageHandler(pFile);
-			if (sFile.isDirectory()) {
-				String[] sources = sFile.list();
-				for (String s : sources) {
-
-					ImageHandler source = new ImageHandler(new File(
-							sFile.getAbsolutePath() + File.separatorChar + s));
-					comp.compare(pattern, source);
-
-				}
-
-			} else {
-				ImageHandler source = new ImageHandler(sFile);
+		}
+		else
+		{
+			patterns[0] = pFile.getAbsolutePath();
+		}
+		
+		// Get a list of source files
+		if(sFile.isDirectory())
+		{
+			sources = sFile.list();
+			for(int i=0; i<sources.length; i++)
+			{
+				sources[i] = sFile.getAbsolutePath() + File.separatorChar + sources[i];
+			}
+		}
+		else
+		{
+			sources[0] = sFile.getAbsolutePath();
+		}
+		
+		// Compare all our patterns with all our sources
+		for(String p : patterns)
+		{
+			ImageHandler pattern = new ImageHandler(new File(p));
+			
+			for(String s : sources)
+			{
+				ImageHandler source = new ImageHandler(new File(s));
+				
 				comp.compare(pattern, source);
 			}
 		}
-
 	}
 }
