@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import ImageMatcher.ImageHandler.FILE_TYPE;
 
@@ -18,16 +16,9 @@ public class ImageComparator implements Comparator
 	public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) 
 	{
         ImagePHash imageHash = new ImagePHash();
-        String patternHash = "";
-        try
-        {
-        	patternHash = imageHash.getHash(patternHandler.getImage());
-        }
-        catch (Exception ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        String patternHash = imageHash.getHash(patternHandler.getImage());
+     
+
         int colorDifferenceMargin = 5;
         
         if(patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)){
@@ -182,17 +173,8 @@ public class ImageComparator implements Comparator
     {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
         ImagePHash imageHasher = new ImagePHash();
-        String hash = "";
-        
-        try
-        {
-        	hash = imageHasher.getHash(subImage);
-        }
-        catch (Exception ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        String hash = imageHasher.getHash(subImage);
+ 
         return hash;
     }
     

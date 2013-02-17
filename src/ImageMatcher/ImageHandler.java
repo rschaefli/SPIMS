@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -16,9 +15,6 @@ import javax.imageio.stream.ImageInputStream;
 
 /**
  * Handles File to BufferedImage validation and conversion
- * 
- * @author RobToombs
- *
  */
 public class ImageHandler{
 
@@ -76,10 +72,8 @@ public class ImageHandler{
 			fis.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("Unable to find file @ " + imageFile.getAbsolutePath());
-			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Error reading file @ " + imageFile.getAbsolutePath());
-			e.printStackTrace();
 		}
 	}
 
@@ -117,12 +111,12 @@ public class ImageHandler{
 	 *  
 	 * @param args
 	 */
-	//	public static void main(String[] args) {
-	//		File file = new File(args[0]);
-	//		ImageHandler handler = new ImageHandler(file);
-	//		if(handler.isValidImg()) {
-	//			BufferedImage img = handler.getImage();
-	//			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
-	//		}
-	//	}
+	/*	public static void main(String[] args) {
+			File file = new File(args[0]);
+			ImageHandler handler = new ImageHandler(file);
+			if(handler.isValidImg()) {
+				BufferedImage img = handler.getImage();
+				System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
+			}
+		}*/
 }
