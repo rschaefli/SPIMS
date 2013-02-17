@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -20,18 +21,20 @@ import javax.imageio.stream.ImageInputStream;
  *
  */
 public class ImageHandler{
-	
+
 	private BufferedImage image = null;     // Handled Image
-	private String imageType = "";
-        private boolean validImg = false;       // Is Handled Image Valid?
-	
+	private boolean validImg = false;       // Is Handled Image Valid?
+	private FILE_TYPE type = null;
+
+	public static enum FILE_TYPE {JPEG, GIF, PNG};
+
 	// List of valid image types (MUST BE LOWERCASE!)
-	private ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
-		add("jpeg");
-		add("png");
-		add("gif");
+	private HashMap<String, FILE_TYPE> FILE_TYPE_HASH = new HashMap<String, FILE_TYPE>() {{
+		put("jpeg", FILE_TYPE.JPEG);
+		put("png", FILE_TYPE.PNG);
+		put("gif", FILE_TYPE.GIF);
 	}};
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -45,10 +48,10 @@ public class ImageHandler{
 			FileInputStream	fis = new FileInputStream(imageFile);	
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			ImageInputStream iis = ImageIO.createImageInputStream(bis);
-	
+
 			// Grab the appropriate image reader for the input stream
 			Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
-			
+
 			// If it is a support ImageIO reader type (JPEG, GIF, PNG, BMP, WBMP)
 			if(iter.hasNext()) {
 				ImageReader reader = (ImageReader) iter.next();
@@ -56,17 +59,17 @@ public class ImageHandler{
 				String fileType = reader.getFormatName().toLowerCase();
 
 				// Validate reader type
-				if(VALID_TYPES.contains(fileType)) {
+				if(FILE_TYPE_HASH.keySet().contains(fileType)) {
 					image = reader.read(0);	
-                                        imageType = fileType;
 					validImg = true;
+					type = FILE_TYPE_HASH.get(fileType);
 				} else {
 					System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
 				}
 			} else {
 				System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
 			}
-			
+
 			// Close the input streams
 			iis.close();
 			bis.close();
@@ -88,11 +91,11 @@ public class ImageHandler{
 	public boolean isValidImg() {
 		return validImg;
 	}
-	
+
 	public void setValidImg(boolean validImg) {
 		this.validImg = validImg;
 	}
-		
+
 	public BufferedImage getImage() {
 		return image;
 	}
@@ -100,22 +103,26 @@ public class ImageHandler{
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
-        
-        public String getImageType(){
-            return imageType;
-        }
+
+	public FILE_TYPE getType() {
+		return type;
+	}
+
+	public void setType(FILE_TYPE type) {
+		this.type = type;
+	}
 
 	/**
 	 * FOR TESTING PURPOSES, CAN REMOVE AT ANY TIME
 	 *  
 	 * @param args
 	 */
-//	public static void main(String[] args) {
-//		File file = new File(args[0]);
-//		ImageHandler handler = new ImageHandler(file);
-//		if(handler.isValidImg()) {
-//			BufferedImage img = handler.getImage();
-//			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
-//		}
-//	}
+	//	public static void main(String[] args) {
+	//		File file = new File(args[0]);
+	//		ImageHandler handler = new ImageHandler(file);
+	//		if(handler.isValidImg()) {
+	//			BufferedImage img = handler.getImage();
+	//			System.out.println("IMAGE WIDTH x HEIGHT DIMENSIONS -- " + img.getWidth() + " x " + img.getHeight());
+	//		}
+	//	}
 }
