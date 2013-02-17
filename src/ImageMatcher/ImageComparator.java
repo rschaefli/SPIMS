@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ImageMatcher.ImageHandler.FILE_TYPE;
+
 public class ImageComparator implements Comparator
 {	
 	public ImageComparator() {}
@@ -28,7 +30,7 @@ public class ImageComparator implements Comparator
         
         int colorDifferenceMargin = 5;
         
-        if(patternHandler.getImageType().equals("gif") || sourceHandler.getImageType().equals("gif")){
+        if(patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)){
             colorDifferenceMargin+=15;
         }
         
