@@ -7,51 +7,55 @@ import java.util.List;
 public class ParameterHandler {
 
 	private List<File> patterns, sources;
-	
+
 	//Checks all parameters and formats the image filepaths
-	public void checkParameters(String[] args) throws Exception{
-		
+	public void checkParameters(String[] args) throws Exception {
+
 		checkAllFlagsExist(args);
-		setFileLocations(args);		
-	
+		setFileLocations(args);
+
 	}
-	
+
 	//
-	private boolean checkAllFlagsExist(String[] args) throws Exception{
-		
-		if(args.length != 4){ throw new Exception("ERROR - Expected 4 Parameters");}
-		if(!args[0].equals("-p")) {throw new Exception("ERROR - Missing Pattern Flag");}
-		if(!args[2].equals("-s")) {throw new Exception("ERROR - Missing Source Flag");}
-		
+	public boolean checkAllFlagsExist(String[] args) throws Exception {
+
+		if (args.length != 4) {
+			throw new Exception("ERROR - Expected 4 Parameters");
+		}
+		if (!args[0].equals("-p")) {
+			throw new Exception("ERROR - Missing Pattern Flag");
+		}
+		if (!args[2].equals("-s")) {
+			throw new Exception("ERROR - Missing Source Flag");
+		}
+
 		return true;
 	}
-	
-	
+
 	//if list of images in args (iterate through image filepaths)
 	private void setFileLocations(String[] args) throws Exception {
-		if(args.length == 2) {
+		if (args.length == 2) {
 			patterns = args[0].equals("-s") ? obtainImagePath(args[1]) : obtainImagePath(args[3]);
 			sources = args[0].equals("-p") ? obtainImagePath(args[1]) : obtainImagePath(args[3]);
 		} else {
 			throw new Exception("ERROR - Not Enough Arguments");
 		}
 	}
-	
-	
+
 	//takes in one filepath and 
 	private List<File> obtainImagePath(String location) throws Exception {
 		List<File> imagePaths = new LinkedList<File>();
 
 		File path = new File(location);
-		
-		if(path.isDirectory()) {
+
+		if (path.isDirectory()) {
 			//TODO YOU ARE A BONER. HANDLE DIRECTORIES HERE
-		}else if(path.isFile()) {
+		} else if (path.isFile()) {
 			imagePaths.add(path);
-		}else {
+		} else {
 			throw new Exception("ERROR - Location Path is Trash Bro " + path);
 		}
-		
+
 		return imagePaths;
 	}
 
@@ -69,5 +73,5 @@ public class ParameterHandler {
 
 	public void setSources(List<File> sources) {
 		this.sources = sources;
-	}		
+	}
 }
