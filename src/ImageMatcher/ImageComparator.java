@@ -15,7 +15,7 @@ public class ImageComparator implements Comparator {
 
     @Override
     public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) {
-        ImagePHash imageHash = new ImagePHash();
+        PHash imageHash = new PHash();
         String patternHash = imageHash.getHash(patternHandler.getImage());
      
         int colorDifferenceMargin = 5;
@@ -169,7 +169,7 @@ public class ImageComparator implements Comparator {
     // and a size of patternWidth x patternHeight
     public static String getPHashOfSubImage(BufferedImage sourceImage, Point location, int patternWidth, int patternHeight) {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
-        ImagePHash imageHasher = new ImagePHash();
+        PHash imageHasher = new PHash();
         String hash = imageHasher.getHash(subImage);
  
         return hash;
