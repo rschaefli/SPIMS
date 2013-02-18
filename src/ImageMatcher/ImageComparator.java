@@ -10,9 +10,6 @@ import ImageMatcher.ImageHandler.FILE_TYPE;
 
 public class ImageComparator implements Comparator {
 
-    public ImageComparator() {
-    }
-
     @Override
     public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) {
         ImagePHash imageHash = new ImagePHash();
@@ -30,8 +27,8 @@ public class ImageComparator implements Comparator {
 
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceHandler.getImage(),
                 possibleTopLeftCorners,
-                patternHandler.getImage().getWidth(),
-                patternHandler.getImage().getHeight());
+                patternHandler.getWidth(),
+                patternHandler.getHeight());
 
         //Hash map for final matches which we will sort through to find
         //the lowest distance of the matches.
@@ -55,16 +52,16 @@ public class ImageComparator implements Comparator {
             System.out.println(patternHandler.getName() + " matches " +
             				   sourceHandler.getName() + " at " +
             				   patternHandler.getWidth() + "x" + patternHandler.getHeight() +
-            				   "+" + Integer.toString(locationOfLowestMatch.x) +
-            				   "+" + Integer.toString(locationOfLowestMatch.y));
+            				   "+" + locationOfLowestMatch.x +
+            				   "+" + locationOfLowestMatch.y);
         }
 
     }
 
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
-    public static ArrayList<Point> findPossibleTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, int errorMargin) {
-        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, 30);
+    private ArrayList<Point> findPossibleTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, int errorMargin) {
+        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage);
         ArrayList<Point> possibleCorners = new ArrayList<Point>();
         int offPixelsToAllow = 5;
 
@@ -97,10 +94,12 @@ public class ImageComparator implements Comparator {
         return possibleCorners;
     }
 
+/*  NOT BEING USED, IS THIS NECESSARY? 
+    
     // Get howManyPerAxis pixels down the X and Y axis
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
-    public static HashMap<Point, Color> getPixelColorsByAxis(BufferedImage image, int howManyPerAxis) {
+    private HashMap<Point, Color> getPixelColorsByAxis(BufferedImage image, int howManyPerAxis) {
     	HashMap<Point, Color> result = new HashMap<Point, Color>();
 
         // Bound the number of pixels to get on the X and Y axis
@@ -122,22 +121,23 @@ public class ImageComparator implements Comparator {
 
         return result;
     }
+*/
     
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
     // back on the left side of the second row.
-    public static HashMap<Point, Color> getPixelColors(BufferedImage image, int step) {
+    private HashMap<Point, Color> getPixelColors(BufferedImage image) {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
         
         mainloop:
         for (int j = 0; j < image.getHeight() - 1; j++) {
-            for (int i = 0; i < image.getWidth() - 1; i += step) {
+            for (int i = 0; i < image.getWidth() - 1; i += 30) {
                 Point curLocation = new Point(i, j);
                 Color curPixel = new Color(image.getRGB(i, j));
 
                 result.put(curLocation, curPixel);
 
-                if (result.size() == step) {
+                if (result.size() == 30) {
                     break mainloop;
                 }
             }
@@ -147,7 +147,7 @@ public class ImageComparator implements Comparator {
 
     // Check if color c1s RGB values are all within errorMargin difference
     // of c2s RGB values
-    public static Boolean isColorCloseTo(Color c1, Color c2, int errorMargin) {
+    private Boolean isColorCloseTo(Color c1, Color c2, int errorMargin) {
         int c1Red = c1.getRed();
         int c2Red = c2.getRed();
         boolean isRedInRange = (c1Red >= c2Red - errorMargin) && (c1Red <= c2Red + errorMargin);
@@ -167,7 +167,7 @@ public class ImageComparator implements Comparator {
     
     // Get a the PHash of a subimage with top left corner at location
     // and a size of patternWidth x patternHeight
-    public static String getPHashOfSubImage(BufferedImage sourceImage, Point location, int patternWidth, int patternHeight) {
+    private String getPHashOfSubImage(BufferedImage sourceImage, Point location, int patternWidth, int patternHeight) {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
         ImagePHash imageHasher = new ImagePHash();
         String hash = imageHasher.getHash(subImage);
@@ -177,7 +177,7 @@ public class ImageComparator implements Comparator {
     
     // Get the PHashes of from a list of locations representing the top left corners of
     // potential matches within the source image
-    public static HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations, int patternWidth, int patternHeight) {
+    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations, int patternWidth, int patternHeight) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 
         for (int i = 0; i < locations.size(); i++) {
@@ -188,7 +188,7 @@ public class ImageComparator implements Comparator {
     }
 
     // Get the difference between 2 strings of equal length
-    public static int getHammingDistance(String one, String two) {
+    private int getHammingDistance(String one, String two) {
         if (one.length() != two.length()) {
             return -1;
         }
