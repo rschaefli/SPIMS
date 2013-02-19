@@ -20,10 +20,10 @@ public class ImageHandler {
 
 	private BufferedImage image = null;     // Handled Image
 	private boolean validImg = false;       // Is Handled Image Valid?
-	private FILE_TYPE type = null;
-	private int width;
-	private int height;
-	private String name;
+	private FILE_TYPE type = null;			// Image Type
+	private int width = 0;					// Image Width
+	private int height = 0;					// Image Height				
+	private String name = "";				// Image Name
 
 	public static enum FILE_TYPE {JPEG, GIF, PNG};
 	
@@ -85,6 +85,9 @@ public class ImageHandler {
 		}
 	}
 
+	
+	/** ---------- GETTERS AND SETTERS ---------- */
+	
 	/**
 	 * Use this to verify that the image being handled is existent/valid before
 	 * using it

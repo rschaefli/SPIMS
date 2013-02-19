@@ -1,4 +1,4 @@
-package ImageMatcher;
+/*package ImageMatcher;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -94,7 +94,7 @@ public class ImageComparator implements Comparator {
         return possibleCorners;
     }
 
-/*  NOT BEING USED, IS THIS NECESSARY? 
+  NOT BEING USED, IS THIS NECESSARY? 
     
     // Get howManyPerAxis pixels down the X and Y axis
     // This is used to elaborate on just comparing the top left pixel of sub images
@@ -121,7 +121,7 @@ public class ImageComparator implements Comparator {
 
         return result;
     }
-*/
+
     
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
@@ -202,3 +202,4 @@ public class ImageComparator implements Comparator {
     }
 }
 
+*/
