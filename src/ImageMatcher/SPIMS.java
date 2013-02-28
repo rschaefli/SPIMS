@@ -2,6 +2,8 @@ package ImageMatcher;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SPIMS {
 
@@ -15,34 +17,12 @@ public class SPIMS {
 		ArrayList<File> patternImgs = ph.getPatterns();
 		ArrayList<File> sourceImgs = ph.getSources();
 
-		// Initialize and begin NUM_THREADS comparison threads
-		ComparisonThread[] compThreads = new ComparisonThread[NUM_THREADS];
-		for(int i = 0; i < NUM_THREADS; i++) {
-			if(patternImgs.size() > 0) {
-				ComparisonThread ct = new ComparisonThread(patternImgs.get(0), sourceImgs, i);
-				ct.start();
-				compThreads[i] = ct;
-				patternImgs.remove(0);
-				System.out.println("Pattern Images Left " + patternImgs.size());
-			}
-		}
-
-		// Continue running pattern comparisons as the initial threads finish
-		while(patternImgs.size() != 0) {
-			for(ComparisonThread ct : compThreads) {
-				if(ct.isThreadFinished()) {
-					int index = ct.getIndex();
-					ComparisonThread newCT = new ComparisonThread(patternImgs.get(0), sourceImgs, index);
-					newCT.start();
-					compThreads[index] = newCT;
-					patternImgs.remove(0);
-					System.out.println("Pattern Images Left " + patternImgs.size());
-					break; // Break out to verify that we still have pattern images left
-				}
-			}
+		ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+		for(File pattern : patternImgs) {
+			ComparisonThread ct = new ComparisonThread(pattern, sourceImgs);
+			executor.execute(ct);
 		}
 		
-
+		executor.shutdown();		
 	}
-	
 }
