@@ -20,9 +20,7 @@ public class ImageHandler {
 
 	private BufferedImage image = null;     // Handled Image
 	private boolean validImg = false;       // Is Handled Image Valid?
-	private FILE_TYPE type = null;			// Image Type
-	private int width = 0;					// Image Width
-	private int height = 0;					// Image Height				
+	private FILE_TYPE type = null;			// Image Type			
 	private String name = "";				// Image Name
 
 	public static enum FILE_TYPE {JPEG, GIF, PNG};
@@ -62,8 +60,6 @@ public class ImageHandler {
 				// Validate reader type
 				if (FILE_TYPE_HASH.keySet().contains(fileType)) {
 					image = reader.read(0);
-					width = image.getWidth();
-					height = image.getHeight();
 					name = imageFile.getName();
 					validImg = true;
 					type = FILE_TYPE_HASH.get(fileType);
@@ -119,11 +115,11 @@ public class ImageHandler {
 	}
 
 	public int getHeight() {
-		return height;
+		return image.getHeight();
 	}
 
 	public int getWidth() {
-		return width;
+		return image.getWidth();
 	}
 
 	public String getName() {
