@@ -22,13 +22,18 @@ public class ImageComparator implements Comparator {
         int colorDifferenceMargin = 5;
         int pHashDistanceBuffer = 5;
 
+        // Become more lenient when dealing with GIF files
         if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
             colorDifferenceMargin += 15;
             pHashDistanceBuffer += 45;
         }
-
+        
+        // Get our initial set of potential top left corners.
         ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners(sourceHandler.getImage(), patternHandler.getImage());
 
+        // Filter down possible top left corners
+        possibleTopLeftCorners = getProbableTopLeftCorners(sourceHandler.getImage(), patternHandler.getImage(), possibleTopLeftCorners, 5);
+        
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceHandler.getImage(),
                 possibleTopLeftCorners,
                 patternHandler.getWidth(),
@@ -128,6 +133,18 @@ public class ImageComparator implements Comparator {
     	}
     	
     	return result;
+    }
+    
+    // Filter down a list of possible top left corners until there are less than max
+    private ArrayList<Point> getProbableTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, ArrayList<Point> possibleTopLeftCorners, int max) {
+    	ArrayList<Point> probableTopLeftCorners = possibleTopLeftCorners;
+    	
+    	// Filter down until we have <= max top left corners
+    	while(probableTopLeftCorners.size() > max) {
+    		probableTopLeftCorners = filterPossibleTopLeftCorners(sourceImage, patternImage, probableTopLeftCorners);
+    	}
+    	
+    	return probableTopLeftCorners;
     }
     
     
