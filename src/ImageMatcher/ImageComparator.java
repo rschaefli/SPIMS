@@ -1,4 +1,4 @@
-/*package ImageMatcher;
+package ImageMatcher;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -8,9 +8,8 @@ import java.util.Map.Entry;
 
 import ImageMatcher.ImageHandler.FILE_TYPE;
 
-public class ImageComparator implements Comparator {
+public class ImageComparator {
 
-    @Override
     public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) {
         PHash imageHash = new PHash();
         String patternHash = imageHash.getHash(patternHandler.getImage());
@@ -55,7 +54,6 @@ public class ImageComparator implements Comparator {
             				   "+" + locationOfLowestMatch.x +
             				   "+" + locationOfLowestMatch.y);
         }
-
     }
 
     // Works in conjunction with getAxisColors to determine if there are potential
@@ -94,8 +92,7 @@ public class ImageComparator implements Comparator {
         return possibleCorners;
     }
 
-  NOT BEING USED, IS THIS NECESSARY? 
-    
+    // NOT BEING USED, IS THIS NECESSARY?
     // Get howManyPerAxis pixels down the X and Y axis
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
@@ -201,5 +198,3 @@ public class ImageComparator implements Comparator {
         return counter;
     }
 }
-
-*/

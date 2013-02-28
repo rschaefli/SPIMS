@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * Handles single pattern to multiple source imagery comparisons
  */
-public class ComparisonThread implements Runnable {
+public class ComparisonThread extends Thread {
 
 	private ImageHandler patternImg = null;					 // Pattern Image
 	private ArrayList<File> sources = new ArrayList<File>(); // File paths for source imagery
@@ -29,6 +29,7 @@ public class ComparisonThread implements Runnable {
 		this.sources = sources; 
 		this.patternImg = new ImageHandler(pattern);
 		this.index = index;
+
 	}
 	
 	/**
@@ -40,18 +41,10 @@ public class ComparisonThread implements Runnable {
 				ImageHandler ih = new ImageHandler(image);
 				
 				if(ih.isValidImg()) {
-					/*
-					 * Run Pattern and Source Comparisons in here
-					 * 
-					 * ex:
-					 * 
-					 * ComparatorAlgorithm.compare(patternImg, sourceImg);
-					 * 
-					 */
+					new ImageComparator().compare(patternImg, ih);
 				}
 			}
 		}
-		
 		threadFinished = true;
 	}
 

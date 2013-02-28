@@ -10,17 +10,17 @@ public class SPIMS {
 	
 	public static void main(String[] args) {
 
-		// Validate Input Parameters
+    	// Validate Input Parameters
 		ParameterHandler ph = new ParameterHandler(args);
 		ArrayList<File> patternImgs = ph.getPatterns();
 		ArrayList<File> sourceImgs = ph.getSources();
 
 		// Initialize and begin NUM_THREADS comparison threads
-		ComparisonThread[] compThreads = new ComparisonThread[5];
+		ComparisonThread[] compThreads = new ComparisonThread[NUM_THREADS];
 		for(int i = 0; i < NUM_THREADS; i++) {
 			if(patternImgs.size() > 0) {
 				ComparisonThread ct = new ComparisonThread(patternImgs.get(0), sourceImgs, i);
-				ct.run();
+				ct.start();
 				compThreads[i] = ct;
 				patternImgs.remove(0);
 			}
@@ -32,14 +32,15 @@ public class SPIMS {
 				if(ct.isThreadFinished()) {
 					int index = ct.getIndex();
 					ComparisonThread newCT = new ComparisonThread(patternImgs.get(0), sourceImgs, index);
-					newCT.run();
+					newCT.start();
 					compThreads[index] = newCT;
 					patternImgs.remove(0);
 					break; // Break out to verify that we still have pattern images left
 				}
 			}
 		}
-	
+		
+
 	}
 	
 }
