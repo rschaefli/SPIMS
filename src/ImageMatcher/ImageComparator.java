@@ -79,45 +79,38 @@ public class ImageComparator implements Comparator {
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
     private ArrayList<Point> findPossibleTopLeftCorners() {
-        HashMap<Point, Color> patternImagePixels = getPixelColors(patternImage, 30);
+        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, 30);
         ArrayList<Point> possibleCorners = new ArrayList<Point>();
+        int offPixelsToAllow = 5;
 
-        for (int i = 0; i < sourceImage.getWidth() - patternImage.getWidth(); i++) {
-            for (int j = 0; j < sourceImage.getHeight() - patternImage.getHeight(); j++) {
-                Point curPixel = new Point(i, j);
-            	
+        for (int i = 0; i <= sourceImage.getWidth() - patternImage.getWidth(); i++) {
+            for (int j = 0; j <= sourceImage.getHeight() - patternImage.getHeight(); j++) {
+                boolean isPotentialMatch = true;
+                int offPixelCount = 0;
+
+                //Loop through the pixels and see if we have any matches
+                for (Entry<Point, Color> entry : patternImageColors.entrySet()) {
+                    Point p = entry.getKey();
+                    Color patternPixelColor = entry.getValue();
+
+                    Color sourcePixelColor = new Color(sourceImage.getRGB(i + p.x, j + p.y));
+
+                    if (!isColorCloseTo(patternPixelColor, sourcePixelColor)) {
+                        offPixelCount++;
+                    }
+
+                    isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
+                }
+
                 // If we have a potential match, add origin to result
-                if (isTopLeftCornerPotentialMatch(patternImagePixels, curPixel)) {
-                    possibleCorners.add(curPixel);
+                if (isPotentialMatch) {
+                    possibleCorners.add(new Point(i, j));
                 }
             }
         }
 
         return possibleCorners;
     }
-    
-    // Determine if this top left corner in the source image is a potential match to the pattern image
-    private boolean isTopLeftCornerPotentialMatch(HashMap<Point, Color> patternImagePixels, Point loc) {
-    	boolean isPotentialMatch = true;
-        int offPixelsToAllow = 5;
-    	int offPixelCount = 0;
-
-        // Loop through the pixels and see if we have any matches
-        for (Entry<Point, Color> entry : patternImagePixels.entrySet()) {
-            Point p = entry.getKey();
-            Color patternPixelColor = entry.getValue();
-            Color sourcePixelColor = new Color(sourceImage.getRGB(loc.x + p.x, loc.y + p.y));
-
-            if (!isColorCloseTo(patternPixelColor, sourcePixelColor)) {
-                offPixelCount++;
-            }
-
-            isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
-        }
-        
-        return isPotentialMatch; 
-    }
-    
     
     // Filter down the list of top left corners by random choosing a pixel and checking
     // that it is close enough to the pattern image pixel
