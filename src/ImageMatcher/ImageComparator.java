@@ -12,7 +12,8 @@ import ImageMatcher.ImageHandler.FILE_TYPE;
 
 public class ImageComparator implements Comparator {
 	
-	private final int PIXEL_COLOR_ERROR_MARGIN = 5;
+	private int PIXEL_COLOR_ERROR_MARGIN = 5;
+	private int PHASH_DISTANCE_BUFFER = 5;
 	
 	private ImageHandler sourceHandler;
 	private ImageHandler patternHandler;
@@ -31,13 +32,10 @@ public class ImageComparator implements Comparator {
         PHash imageHash = new PHash();
         String patternHash = imageHash.getHash(patternImage);
      
-        int colorDifferenceMargin = 5;
-        int pHashDistanceBuffer = 5;
-
         // Become more lenient when dealing with GIF files
         if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
-            colorDifferenceMargin += 15;
-            pHashDistanceBuffer += 45;
+        	PIXEL_COLOR_ERROR_MARGIN += 15;
+            PHASH_DISTANCE_BUFFER += 45;
         }
         
         // Get our initial set of potential top left corners.
@@ -45,7 +43,7 @@ public class ImageComparator implements Comparator {
 
         // Filter down possible top left corners
         // Commented out so as to not confuse Dan/Rob to test their stuff
-        // possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
+        //possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
         
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, possibleTopLeftCorners);
 
@@ -61,7 +59,7 @@ public class ImageComparator implements Comparator {
             String subimageHash = entry.getValue();
             int difference = getHammingDistance(patternHash, subimageHash);
 
-            if (difference != -1 && difference < pHashDistanceBuffer && difference < lowestDifference) {
+            if (difference != -1 && difference < PHASH_DISTANCE_BUFFER && difference < lowestDifference) {
                 locationOfLowestMatch = location;
                 lowestDifference = difference;
             }
