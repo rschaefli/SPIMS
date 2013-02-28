@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class SPIMS {
 
 	// Specifies the desired number of comparison threads
-	private final static int NUM_THREADS = 1;
+	private final static int NUM_THREADS = 4;
 	
 	public static void main(String[] args) {
 
