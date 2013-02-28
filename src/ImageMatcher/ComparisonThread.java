@@ -29,13 +29,13 @@ public class ComparisonThread extends Thread {
 		this.sources = sources; 
 		this.patternImg = new ImageHandler(pattern);
 		this.index = index;
-
 	}
 	
 	/**
 	 * Begins the pattern image -> source imagery comparisons
 	 */
 	public void run() {
+		System.out.println("Beginning comparisons on thread " + index + " with " + patternImg.getName());
 		if(patternImg.isValidImg()) {
 			for(File image : sources) {
 				ImageHandler ih = new ImageHandler(image);
@@ -47,6 +47,7 @@ public class ComparisonThread extends Thread {
 			}
 		}
 		threadFinished = true;
+		System.out.println("Ending comparisons on thread " + index);
 	}
 
 

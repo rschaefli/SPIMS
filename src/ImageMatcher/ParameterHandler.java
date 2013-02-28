@@ -53,6 +53,7 @@ public class ParameterHandler {
 	 * @throws Exception Indicates potential invalid path
 	 */
 	private void setImagery(String[] args) throws Exception {
+		System.out.println(args[0] + " " + args[1] + " " + args[2] + " " + args[3]);
 		this.patterns = args[0].equals("-p") ? obtainImagery(args[1]) : obtainImagery(args[3]);
 		this.sources = args[0].equals("-s") ? obtainImagery(args[1]) : obtainImagery(args[3]);
 	}

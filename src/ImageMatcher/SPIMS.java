@@ -23,6 +23,7 @@ public class SPIMS {
 				ct.start();
 				compThreads[i] = ct;
 				patternImgs.remove(0);
+				System.out.println("Pattern Images Left " + patternImgs.size());
 			}
 		}
 
@@ -35,6 +36,7 @@ public class SPIMS {
 					newCT.start();
 					compThreads[index] = newCT;
 					patternImgs.remove(0);
+					System.out.println("Pattern Images Left " + patternImgs.size());
 					break; // Break out to verify that we still have pattern images left
 				}
 			}
