@@ -41,7 +41,8 @@ public class ComparisonThread extends Thread {
 				ImageHandler ih = new ImageHandler(image);
 				
 				if(ih.isValidImg()) {
-					new ImageComparator().compare(patternImg, ih);
+					ImageComparator ic = new ImageComparator(patternImg, ih);
+					ic.compare();
 				}
 			}
 		}

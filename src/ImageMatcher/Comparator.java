@@ -9,5 +9,5 @@ package ImageMatcher;
  */
 public interface Comparator
 {
-	public void compare(ImageHandler pattern, ImageHandler source);
+	public void compare();
 }

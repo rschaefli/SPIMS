@@ -1,33 +1,53 @@
 package ImageMatcher;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import ImageMatcher.ImageHandler.FILE_TYPE;
 
-public class ImageComparator {
-
-    public void compare(ImageHandler patternHandler, ImageHandler sourceHandler) {
+public class ImageComparator implements Comparator {
+	
+	private final int PIXEL_COLOR_ERROR_MARGIN = 5;
+	
+	private ImageHandler sourceHandler;
+	private ImageHandler patternHandler;
+	private BufferedImage sourceImage;
+	private BufferedImage patternImage;
+	
+	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler){
+		this.sourceHandler = sourceHandler;
+		this.patternHandler = patternHandler;
+		this.sourceImage = sourceHandler.getImage();
+		this.patternImage = patternHandler.getImage();
+	}
+	
+    @Override
+    public void compare() {
         PHash imageHash = new PHash();
-        String patternHash = imageHash.getHash(patternHandler.getImage());
+        String patternHash = imageHash.getHash(patternImage);
      
         int colorDifferenceMargin = 5;
         int pHashDistanceBuffer = 5;
 
+        // Become more lenient when dealing with GIF files
         if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
             colorDifferenceMargin += 15;
             pHashDistanceBuffer += 45;
         }
+        
+        // Get our initial set of potential top left corners.
+        ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners();
 
-        ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners(sourceHandler.getImage(), patternHandler.getImage(), colorDifferenceMargin);
-
-        HashMap<Point, String> hashes = getPHashesOfLocations(sourceHandler.getImage(),
-                possibleTopLeftCorners,
-                patternHandler.getWidth(),
-                patternHandler.getHeight());
+        // Filter down possible top left corners
+        // Commented out so as to not confuse Dan/Rob to test their stuff
+        // possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
+        
+        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, possibleTopLeftCorners);
 
         //Hash map for final matches which we will sort through to find
         //the lowest distance of the matches.
@@ -58,41 +78,82 @@ public class ImageComparator {
 
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
-    private ArrayList<Point> findPossibleTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, int errorMargin) {
-        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage);
+    private ArrayList<Point> findPossibleTopLeftCorners() {
+        HashMap<Point, Color> patternImagePixels = getPixelColors(patternImage, 30);
         ArrayList<Point> possibleCorners = new ArrayList<Point>();
-        int offPixelsToAllow = 5;
 
-        for (int i = 0; i <= sourceImage.getWidth() - patternImage.getWidth(); i++) {
-            for (int j = 0; j <= sourceImage.getHeight() - patternImage.getHeight(); j++) {
-                boolean isPotentialMatch = true;
-                int offPixelCount = 0;
-
-                //Loop through the pixels and see if we have any matches
-                for (Entry<Point, Color> entry : patternImageColors.entrySet()) {
-                    Point p = entry.getKey();
-                    Color patternPixelColor = entry.getValue();
-
-                    Color sourcePixelColor = new Color(sourceImage.getRGB(i + p.x, j + p.y));
-
-                    if (!isColorCloseTo(patternPixelColor, sourcePixelColor, errorMargin)) {
-                        offPixelCount++;
-                    }
-
-                    isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
-                }
-
+        for (int i = 0; i < sourceImage.getWidth() - patternImage.getWidth(); i++) {
+            for (int j = 0; j < sourceImage.getHeight() - patternImage.getHeight(); j++) {
+                Point curPixel = new Point(i, j);
+            	
                 // If we have a potential match, add origin to result
-                if (isPotentialMatch) {
-                    possibleCorners.add(new Point(i, j));
+                if (isTopLeftCornerPotentialMatch(patternImagePixels, curPixel)) {
+                    possibleCorners.add(curPixel);
                 }
             }
         }
 
         return possibleCorners;
     }
+    
+    // Determine if this top left corner in the source image is a potential match to the pattern image
+    private boolean isTopLeftCornerPotentialMatch(HashMap<Point, Color> patternImagePixels, Point loc) {
+    	boolean isPotentialMatch = true;
+        int offPixelsToAllow = 5;
+    	int offPixelCount = 0;
 
-    // NOT BEING USED, IS THIS NECESSARY?
+        // Loop through the pixels and see if we have any matches
+        for (Entry<Point, Color> entry : patternImagePixels.entrySet()) {
+            Point p = entry.getKey();
+            Color patternPixelColor = entry.getValue();
+            Color sourcePixelColor = new Color(sourceImage.getRGB(loc.x + p.x, loc.y + p.y));
+
+            if (!isColorCloseTo(patternPixelColor, sourcePixelColor)) {
+                offPixelCount++;
+            }
+
+            isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);
+        }
+        
+        return isPotentialMatch; 
+    }
+    
+    
+    // Filter down the list of top left corners by random choosing a pixel and checking
+    // that it is close enough to the pattern image pixel
+    private ArrayList<Point> filterPossibleTopLeftCorners(BufferedImage sourceImage, BufferedImage patternImage, ArrayList<Point> topLeftCorners){
+    	ArrayList<Point> result = new ArrayList<Point>();
+    	
+    	// First we get a random pixel within the pattern image
+    	Random r = new Random();
+    	int randomX = r.nextInt(patternImage.getWidth());
+    	int randomY = r.nextInt(patternImage.getHeight());
+    	Color patternColor = new Color(patternImage.getRGB(randomX, randomY));
+    	
+    	// Now we get that same pixel relative to the top left corners
+    	// of the source image.
+    	for(Point p : topLeftCorners) {
+    		Color sourceColor = new Color(sourceImage.getRGB(p.x + randomX, p.y + randomY));
+    		if(isColorCloseTo(patternColor, sourceColor)) {
+    			result.add(p);
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    // Filter down a list of possible top left corners until there are less than max
+    private ArrayList<Point> getProbableTopLeftCorners(ArrayList<Point> possibleTopLeftCorners, int max) {
+    	ArrayList<Point> probableTopLeftCorners = possibleTopLeftCorners;
+    	
+    	// Filter down until we have <= max top left corners
+    	while(probableTopLeftCorners.size() > max) {
+    		probableTopLeftCorners = filterPossibleTopLeftCorners(sourceImage, patternImage, probableTopLeftCorners);
+    	}
+    	
+    	return probableTopLeftCorners;
+    }
+    
     // Get howManyPerAxis pixels down the X and Y axis
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
@@ -123,7 +184,7 @@ public class ImageComparator {
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
     // back on the left side of the second row.
-    private HashMap<Point, Color> getPixelColors(BufferedImage image) {
+    private HashMap<Point, Color> getPixelColors(BufferedImage image, int limit) {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
         
         mainloop:
@@ -134,7 +195,7 @@ public class ImageComparator {
 
                 result.put(curLocation, curPixel);
 
-                if (result.size() == 30) {
+                if (result.size() == limit) {
                     break mainloop;
                 }
             }
@@ -144,18 +205,18 @@ public class ImageComparator {
 
     // Check if color c1s RGB values are all within errorMargin difference
     // of c2s RGB values
-    private Boolean isColorCloseTo(Color c1, Color c2, int errorMargin) {
+    private Boolean isColorCloseTo(Color c1, Color c2) {
         int c1Red = c1.getRed();
         int c2Red = c2.getRed();
-        boolean isRedInRange = (c1Red >= c2Red - errorMargin) && (c1Red <= c2Red + errorMargin);
+        boolean isRedInRange = (c1Red >= c2Red - PIXEL_COLOR_ERROR_MARGIN) && (c1Red <= c2Red + PIXEL_COLOR_ERROR_MARGIN);
 
         int c1Green = c1.getGreen();
         int c2Green = c2.getGreen();
-        boolean isGreenInRange = (c1Green >= c2Green - errorMargin) && (c1Green <= c2Green + errorMargin);
+        boolean isGreenInRange = (c1Green >= c2Green - PIXEL_COLOR_ERROR_MARGIN) && (c1Green <= c2Green + PIXEL_COLOR_ERROR_MARGIN);
 
         int c1Blue = c1.getBlue();
         int c2Blue = c2.getBlue();
-        boolean isBlueInRange = (c1Blue >= c2Blue - errorMargin) && (c1Blue <= c2Blue + errorMargin);
+        boolean isBlueInRange = (c1Blue >= c2Blue - PIXEL_COLOR_ERROR_MARGIN) && (c1Blue <= c2Blue + PIXEL_COLOR_ERROR_MARGIN);
 
         return (isRedInRange && isGreenInRange) || (isRedInRange && isBlueInRange) || (isBlueInRange && isGreenInRange);
         //(isRedInRange && isGreenInRange && isBlueInRange);
@@ -168,17 +229,17 @@ public class ImageComparator {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
         PHash imageHasher = new PHash();
         String hash = imageHasher.getHash(subImage);
- 
+        
         return hash;
     }
     
     // Get the PHashes of from a list of locations representing the top left corners of
     // potential matches within the source image
-    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations, int patternWidth, int patternHeight) {
+    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 
         for (int i = 0; i < locations.size(); i++) {
-            hashes.put(locations.get(i), getPHashOfSubImage(sourceImage, locations.get(i), patternWidth, patternHeight));
+            hashes.put(locations.get(i), getPHashOfSubImage(sourceImage, locations.get(i), patternImage.getWidth(), patternImage.getHeight()));
         }
 
         return hashes;
