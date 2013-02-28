@@ -44,7 +44,8 @@ public class ImageComparator implements Comparator {
         ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners();
 
         // Filter down possible top left corners
-        possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
+        // Commented out so as to not confuse Dan/Rob to test their stuff
+        // possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
         
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, possibleTopLeftCorners);
 
@@ -231,7 +232,7 @@ public class ImageComparator implements Comparator {
         BufferedImage subImage = sourceImage.getSubimage(location.x, location.y, patternWidth, patternHeight);
         PHash imageHasher = new PHash();
         String hash = imageHasher.getHash(subImage);
- 
+        
         return hash;
     }
     
