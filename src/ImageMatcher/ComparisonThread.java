@@ -45,7 +45,8 @@ public class ComparisonThread implements Runnable {
 					 * 
 					 * ex:
 					 * 
-					 * ComparatorAlgorithm.compare(patternImg, sourceImg);
+					 * ImageComparator ic = new ImageComparator(patternImg, sourceImg);
+					 * ic.compare();
 					 * 
 					 */
 				}
