@@ -35,11 +35,11 @@ public class ComparisonThread implements Runnable {
 	public void run() {
 		if(patternImg.isValidImg()) {
 			for(File image : sources) {
-				ImageHandler ih = new ImageHandler(image);
+				ImageHandler sourceImg = new ImageHandler(image);
 				
-				if(ih.isValidImg()) {
-					ImageComparator ic = new ImageComparator(patternImg, ih);
-					ic.compare();
+				if(sourceImg.isValidImg()) {
+					ImageComparator ic = new ImageComparator(patternImg, sourceImg);
+					ic.compare();  
 				}
 			}
 		}

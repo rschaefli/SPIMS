@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import ImageMatcher.ImageHandler.FILE_TYPE;
+import spims.ImageHandler.FILE_TYPE;
 
 public class ImageComparator implements Comparator {
 	
@@ -30,6 +30,7 @@ public class ImageComparator implements Comparator {
     @Override
     public void compare() {
         PHash imageHash = new PHash();
+        
         String patternHash = imageHash.getHash(patternImage);
      
         // Become more lenient when dealing with GIF files
@@ -39,7 +40,23 @@ public class ImageComparator implements Comparator {
         }
         
         // Get our initial set of potential top left corners.
-        ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners();
+        //If there are too many possibilities to hash them all, run again with 
+        //a greater pixel limit
+        ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners(30);
+        if(possibleTopLeftCorners.size() > 10){
+            possibleTopLeftCorners = findPossibleTopLeftCorners(100);
+        }
+        if(possibleTopLeftCorners.size() > 10){
+            possibleTopLeftCorners = findPossibleTopLeftCorners(500);
+        }
+        if(possibleTopLeftCorners.size() > 10){
+            possibleTopLeftCorners = findPossibleTopLeftCorners(1000);
+        }
+        if(possibleTopLeftCorners.size() > 25){
+            possibleTopLeftCorners = findPossibleTopLeftCorners(2000);
+        }
+
+        
 
         // Filter down possible top left corners
         // Commented out so as to not confuse Dan/Rob to test their stuff
@@ -49,6 +66,7 @@ public class ImageComparator implements Comparator {
 
         //Hash map for final matches which we will sort through to find
         //the lowest distance of the matches.
+        boolean hasExactMatch = false;
         Point locationOfLowestMatch = null;
         int lowestDifference = 100;
 
@@ -58,26 +76,37 @@ public class ImageComparator implements Comparator {
             Point location = entry.getKey();
             String subimageHash = entry.getValue();
             int difference = getHammingDistance(patternHash, subimageHash);
-
-            if (difference != -1 && difference < PHASH_DISTANCE_BUFFER && difference < lowestDifference) {
+           // System.out.println(difference);
+            
+            //If exact match print out
+            if(difference == 0){
+                printMatch(patternHandler, sourceHandler, location);
+                hasExactMatch = true;
+            }else if(difference != -1 && difference < PHASH_DISTANCE_BUFFER && difference < lowestDifference) {
                 locationOfLowestMatch = location;
                 lowestDifference = difference;
             }
         }
 
-        if (locationOfLowestMatch != null && lowestDifference < 15) {
-            System.out.println(patternHandler.getName() + " matches " +
+        //If there were no exact matches, take the lowest possible match
+        if (locationOfLowestMatch != null && lowestDifference < 15 && !hasExactMatch ) {
+            printMatch(patternHandler, sourceHandler, locationOfLowestMatch);
+        }
+    }
+    
+    //Print a match to standard output
+    private void printMatch(ImageHandler patternHandler, ImageHandler sourceHandler, Point location){
+        System.out.println(patternHandler.getName() + " matches " +
             				   sourceHandler.getName() + " at " +
             				   patternHandler.getWidth() + "x" + patternHandler.getHeight() +
-            				   "+" + locationOfLowestMatch.x +
-            				   "+" + locationOfLowestMatch.y);
-        }
+            				   "+" + location.x +
+            				   "+" + location.y);
     }
 
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
-    private ArrayList<Point> findPossibleTopLeftCorners() {
-        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, 30);
+    private ArrayList<Point> findPossibleTopLeftCorners(int pixelCountLimit) {
+        HashMap<Point, Color> patternImageColors = getPixelColors(patternImage, pixelCountLimit);
         ArrayList<Point> possibleCorners = new ArrayList<Point>();
         int offPixelsToAllow = 5;
 

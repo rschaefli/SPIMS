@@ -39,11 +39,15 @@ public class ParameterHandler {
 			throw new Exception("ERROR - Expected 4 Parameters");
 		}
 		if (!args[0].equals("-p")) {
-			throw new Exception("ERROR - Missing Pattern Flag");
+                    if(!args[0].equals("-pdir")){
+                        throw new Exception("ERROR - Missing Pattern Flag");
+                    }
 		}
-		if (!args[2].equals("-s")) {
+		if (!args[2].equals("-s")){
+                    if(!args[2].equals("-sdir")){
 			throw new Exception("ERROR - Missing Source Flag");
-		}
+                    }
+                }
 	}
 
 	/**
@@ -53,8 +57,8 @@ public class ParameterHandler {
 	 * @throws Exception Indicates potential invalid path
 	 */
 	private void setImagery(String[] args) throws Exception {
-		this.patterns = args[0].equals("-p") ? obtainImagery(args[1]) : obtainImagery(args[3]);
-		this.sources = args[0].equals("-s") ? obtainImagery(args[1]) : obtainImagery(args[3]);
+		this.patterns = obtainImagery(args[1]);
+		this.sources = obtainImagery(args[3]);
 	}
 
 	/**
