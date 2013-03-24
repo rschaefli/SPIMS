@@ -34,12 +34,15 @@ public class ComparisonThread implements Runnable {
 	@Override
 	public void run() {
 		if(patternImg.isValidImg()) {
+	        PHash imageHash = new PHash();   
+	        String patternHash = imageHash.getHash(patternImg.getImage());
+	     
 			for(File image : sources) {
 				ImageHandler sourceImg = new ImageHandler(image);
 				
 				if(sourceImg.isValidImg()) {
 					ImageComparator ic = new ImageComparator(patternImg, sourceImg);
-					ic.compare();  
+					ic.compare(patternHash);  
 				}
 			}
 		}

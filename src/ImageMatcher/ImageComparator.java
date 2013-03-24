@@ -28,11 +28,8 @@ public class ImageComparator implements Comparator {
 	}
 	
     @Override
-    public void compare() {
-        PHash imageHash = new PHash();
-        
-        String patternHash = imageHash.getHash(patternImage);
-     
+    public void compare(String patternHash) {
+
         // Become more lenient when dealing with GIF files
         if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
         	PIXEL_COLOR_ERROR_MARGIN += 15;
