@@ -41,8 +41,8 @@ public class ComparisonThread implements Runnable {
 				ImageHandler sourceImg = new ImageHandler(image);
 				
 				if(sourceImg.isValidImg()) {
-					ImageComparator ic = new ImageComparator(patternImg, sourceImg);
-					ic.compare(patternHash);  
+					ImageComparator ic = new ImageComparator(patternImg, sourceImg, patternHash);
+					ic.compare();  
 				}
 			}
 		}

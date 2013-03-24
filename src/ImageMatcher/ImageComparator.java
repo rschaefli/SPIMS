@@ -19,16 +19,18 @@ public class ImageComparator implements Comparator {
 	private ImageHandler patternHandler;
 	private BufferedImage sourceImage;
 	private BufferedImage patternImage;
+	private String patternHash;
 	
-	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler){
+	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler, String patternHash){
 		this.sourceHandler = sourceHandler;
 		this.patternHandler = patternHandler;
 		this.sourceImage = sourceHandler.getImage();
 		this.patternImage = patternHandler.getImage();
+		this.patternHash = patternHash;
 	}
 	
     @Override
-    public void compare(String patternHash) {
+    public void compare() {
 
         // Become more lenient when dealing with GIF files
         if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
