@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import ImageMatcher.ImageHandler.FILE_TYPE;
-
 public class ImageComparator implements Comparator {
 	
 	private int PIXEL_COLOR_ERROR_MARGIN = 5;
@@ -33,7 +31,7 @@ public class ImageComparator implements Comparator {
     public void compare() {
 
         // Become more lenient when dealing with GIF files
-        if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
+        if (patternHandler.getType().equals("gif") || sourceHandler.getType().equals("gif")) {
         	PIXEL_COLOR_ERROR_MARGIN += 15;
             PHASH_DISTANCE_BUFFER += 45;
         }
