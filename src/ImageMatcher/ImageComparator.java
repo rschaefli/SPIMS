@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.lang.Math.*;
+import java.util.List;
 
 import spims.ImageHandler.FILE_TYPE;
 
@@ -45,25 +46,19 @@ public class ImageComparator implements Comparator {
         // Get our initial set of potential top left corners.
         //If there are too many possibilities to hash them all, run again with 
         //a greater pixel limit
-        ArrayList<Point> possibleTopLeftCorners = findPossibleTopLeftCorners();
-        if(possibleTopLeftCorners.size() > 100){
-            System.out.println("NOT GOOD!!!");
-            return;
-        }
-
-        
+        PotentialMatchManager potentialMatchManager = findPossibleTopLeftCorners();
 
         // Filter down possible top left corners
         // Commented out so as to not confuse Dan/Rob to test their stuff
         //possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
         
-        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, possibleTopLeftCorners);
+        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.getBestMatches(25));
 
         //Hash map for final matches which we will sort through to find
         //the lowest distance of the matches.
         boolean hasExactMatch = false;
         Point locationOfLowestMatch = null;
-        int lowestDifference = 100;
+        int lowestDifference = 64;
 
         // Get a map of Locations -> PHashes
         // Compare each and check if we have a match at that location
@@ -100,17 +95,16 @@ public class ImageComparator implements Comparator {
 
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
-    private ArrayList<Point> findPossibleTopLeftCorners() {
+    private PotentialMatchManager findPossibleTopLeftCorners() {
         HashMap<Point, Color> patternImageColors = getPixelColors(patternImage);
-        ArrayList<Point> possibleCorners = new ArrayList<Point>();
+        PotentialMatchManager potentialMatchManager = new PotentialMatchManager();
         int offPixelsToAllow = 5;
 
         for (int i = 0; i <= sourceImage.getWidth() - patternImage.getWidth(); i++) {
             for (int j = 0; j <= sourceImage.getHeight() - patternImage.getHeight(); j++) {
                 boolean isPotentialMatch = true;
                 int offPixelCount = 0;
-                int averageDifference = 0;
-                int numOfPixels = 0;
+                ColorDifference difference = new ColorDifference(0, 0, 0);
 
                 //Loop through the pixels and see if we have any matches
                 for (Entry<Point, Color> entry : patternImageColors.entrySet()) {
@@ -123,29 +117,19 @@ public class ImageComparator implements Comparator {
                         offPixelCount++;
                     }
                     
-                    averageDifference += differenceBetweenColors(patternPixelColor, sourcePixelColor);
-                    numOfPixels++;
+                    difference.addColorDifference(differenceBetweenColors(patternPixelColor, sourcePixelColor));
                     
-
                     isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);                   
-                    
                 }
-                
-                averageDifference = averageDifference / numOfPixels;
-                
-//                if(i == 101 && j == 998){
-//                    System.out.println(isPotentialMatch);
-//                    System.out.println(averageDifference);
-//                }
 
                 // If we have a potential match, add origin to result
-                if (isPotentialMatch && averageDifference < AVERAGE_DIFFERENCE_BUFFER) {
-                    possibleCorners.add(new Point(i, j));
+                if (isPotentialMatch) {
+                    potentialMatchManager.addPotentialMatch(new PotentialMatch(new Point(i, j), difference));
                 }
             }
         }
 
-        return possibleCorners;
+        return potentialMatchManager;
     }
     
     // Filter down the list of top left corners by random choosing a pixel and checking
@@ -309,20 +293,20 @@ public class ImageComparator implements Comparator {
 
     }
     
-    private int differenceBetweenColors(Color c1, Color c2){
+    private ColorDifference differenceBetweenColors(Color c1, Color c2){
         int r1 = c1.getRed();
         int r2 = c2.getRed();
-        int diffR = r2 - r1;
+        int diffR = Math.abs(r2 - r1);
         
         int b1 = c1.getBlue();
         int b2 = c2.getBlue();
-        int diffB = b2 - b1;
+        int diffB = Math.abs(b2 - b1);
         
         int g1 = c1.getGreen();
         int g2 = c2.getGreen();
-        int diffG = g2 - g1;
+        int diffG = Math.abs(g2 - g1);
         
-        return Math.abs(diffR)+ Math.abs(diffB) + Math.abs(diffG);
+        return new ColorDifference(diffR, diffG, diffB);
     }
     
         private String strinDifferenceBetweenColors(Color c1, Color c2){
@@ -353,11 +337,12 @@ public class ImageComparator implements Comparator {
     
     // Get the PHashes of from a list of locations representing the top left corners of
     // potential matches within the source image
-    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, ArrayList<Point> locations) {
+    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, List<PotentialMatch> potentialMatches) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 
-        for (int i = 0; i < locations.size(); i++) {
-            hashes.put(locations.get(i), getPHashOfSubImage(sourceImage, locations.get(i), patternImage.getWidth(), patternImage.getHeight()));
+        for (int i = 0; i < potentialMatches.size(); i++) {
+            Point location = potentialMatches.get(i).point;
+            hashes.put(location, getPHashOfSubImage(sourceImage, location, patternImage.getWidth(), patternImage.getHeight()));
         }
 
         return hashes;
