@@ -7,16 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.lang.Math.*;
 import java.util.List;
 
-import spims.ImageHandler.FILE_TYPE;
+import ImageMatcher.ImageHandler.FILE_TYPE;
 
 public class ImageComparator implements Comparator {
 	
 	private int PIXEL_COLOR_ERROR_MARGIN = 5;
 	private int PHASH_DISTANCE_BUFFER = 5;
-        private int AVERAGE_DIFFERENCE_BUFFER = 35;
+    private int AVERAGE_DIFFERENCE_BUFFER = 35;
 	
 	private ImageHandler sourceHandler;
 	private ImageHandler patternHandler;
@@ -44,53 +43,28 @@ public class ImageComparator implements Comparator {
         }
         
         // Get our initial set of potential top left corners.
-        //If there are too many possibilities to hash them all, run again with 
-        //a greater pixel limit
         PotentialMatchManager potentialMatchManager = findPossibleTopLeftCorners();
 
         // Filter down possible top left corners
-        // Commented out so as to not confuse Dan/Rob to test their stuff
         //possibleTopLeftCorners = getProbableTopLeftCorners(possibleTopLeftCorners, 5);
         
-        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.getBestMatches(25));
-
-        //Hash map for final matches which we will sort through to find
-        //the lowest distance of the matches.
-        boolean hasExactMatch = false;
-        Point locationOfLowestMatch = null;
-        int lowestDifference = 64;
-
         // Get a map of Locations -> PHashes
-        // Compare each and check if we have a match at that location
+        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.getBestMatches(25));
+        // Pass off our results to the match handler
+        MatchHandler matchHandler = new MatchHandler();
         for (Entry<Point, String> entry : hashes.entrySet()) {
             Point location = entry.getKey();
             String subimageHash = entry.getValue();
             int difference = getHammingDistance(patternHash, subimageHash);
-           // System.out.println(difference);
             
-            //If exact match print out
-            if(difference == 0){
-                printMatch(patternHandler, sourceHandler, location);
-                hasExactMatch = true;
-            }else if(difference != -1 && difference < PHASH_DISTANCE_BUFFER && difference < lowestDifference) {
-                locationOfLowestMatch = location;
-                lowestDifference = difference;
+            Match m = new Match(patternHandler, sourceHandler, location, difference);
+            if(m.isMatch()) {
+            	matchHandler.add(m);
             }
         }
-
-        //If there were no exact matches, take the lowest possible match
-        if (locationOfLowestMatch != null && lowestDifference < 15 && !hasExactMatch ) {
-            printMatch(patternHandler, sourceHandler, locationOfLowestMatch);
-        }
-    }
-    
-    //Print a match to standard output
-    private void printMatch(ImageHandler patternHandler, ImageHandler sourceHandler, Point location){
-        System.out.println(patternHandler.getName() + " matches " +
-            				   sourceHandler.getName() + " at " +
-            				   patternHandler.getWidth() + "x" + patternHandler.getHeight() +
-            				   "+" + location.x +
-            				   "+" + location.y);
+        
+        // Print out our matches
+        matchHandler.printMatches();
     }
 
     // Works in conjunction with getAxisColors to determine if there are potential
@@ -124,7 +98,7 @@ public class ImageComparator implements Comparator {
 
                 // If we have a potential match, add origin to result
                 if (isPotentialMatch) {
-                    potentialMatchManager.addPotentialMatch(new PotentialMatch(new Point(i, j), difference));
+                    potentialMatchManager.add(new PotentialMatch(new Point(i, j), difference));
                 }
             }
         }

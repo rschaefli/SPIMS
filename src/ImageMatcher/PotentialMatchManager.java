@@ -20,7 +20,7 @@ public class PotentialMatchManager {
         potentialMatches = new ArrayList<PotentialMatch>();
     }
     
-    public void addPotentialMatch(PotentialMatch potentialMatch) {
+    public void add(PotentialMatch potentialMatch) {
         potentialMatches.add(potentialMatch);
         
     }
