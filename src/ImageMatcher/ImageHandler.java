@@ -1,17 +1,23 @@
 package ImageMatcher;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 /**
  * Handles File to BufferedImage validation and conversion
@@ -20,20 +26,13 @@ public class ImageHandler {
 
 	private BufferedImage image = null;     // Handled Image
 	private boolean validImg = false;       // Is Handled Image Valid?
-	private FILE_TYPE type = null;			// Image Type			
+	private String type = null;			    // Image Type			
 	private String name = "";				// Image Name
-
-	public static enum FILE_TYPE {JPEG, GIF, PNG};
-	
-	// List of valid image types (MUST BE LOWERCASE!)
-	private HashMap<String, FILE_TYPE> FILE_TYPE_HASH = new HashMap<String, FILE_TYPE>() {
-		{
-			put("jpeg", FILE_TYPE.JPEG);
-			put("png", FILE_TYPE.PNG);
-			put("gif", FILE_TYPE.GIF);
-		}
-	};
-
+	private final ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
+		add("gif"); 
+		add("jpeg");
+		add("png");
+	}};
 	/**
 	 * Constructor
 	 *
@@ -58,11 +57,11 @@ public class ImageHandler {
 				String fileType = reader.getFormatName().toLowerCase();
 
 				// Validate reader type
-				if (FILE_TYPE_HASH.keySet().contains(fileType)) {
+				if (VALID_TYPES.contains(fileType)) {
 					image = reader.read(0);
 					name = imageFile.getName();
 					validImg = true;
-					type = FILE_TYPE_HASH.get(fileType);
+					type = fileType;
 				} else {
 					System.out.println("Invalid image type @ " + imageFile.getAbsolutePath());
 				}
@@ -81,9 +80,40 @@ public class ImageHandler {
 		}
 	}
 
-	
+	public void convertToGIF() {
+
+		if(!type.equals("gif")) {
+			BufferedImage gif = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = gif.createGraphics();
+			g.drawImage(image,0,0,null);
+			g.dispose();
+			
+			ImageWriter write = ImageIO.getImageWritersBySuffix("gif").next();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			try {
+				ImageOutputStream imageos = ImageIO.createImageOutputStream(out);
+				write.setOutput(imageos);
+				write.write(gif);
+				imageos.flush();
+				
+				image = gif;
+				type = "gif";
+			} catch (IOException e) {
+				System.out.println("Error Converting to GIF");
+			}
+		}
+	}
+
+	public void convertToGreyScale() {		
+		BufferedImage gray = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D g = gray.createGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		image = gray;
+	}
+
 	/** ---------- GETTERS AND SETTERS ---------- */
-	
+
 	/**
 	 * Use this to verify that the image being handled is existent/valid before
 	 * using it
@@ -106,14 +136,6 @@ public class ImageHandler {
 		this.image = image;
 	}
 
-	public FILE_TYPE getType() {
-		return type;
-	}
-
-	public void setType(FILE_TYPE type) {
-		this.type = type;
-	}
-
 	public int getHeight() {
 		return image.getHeight();
 	}
@@ -124,5 +146,17 @@ public class ImageHandler {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

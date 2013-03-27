@@ -9,8 +9,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.List;
 
-import ImageMatcher.ImageHandler.FILE_TYPE;
-
 public class ImageComparator implements Comparator {
 	
 	private int PIXEL_COLOR_ERROR_MARGIN = 5;
@@ -21,23 +19,22 @@ public class ImageComparator implements Comparator {
 	private ImageHandler patternHandler;
 	private BufferedImage sourceImage;
 	private BufferedImage patternImage;
+	private String patternHash;
 	
-	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler){
+	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler, String patternHash){
 		this.sourceHandler = sourceHandler;
 		this.patternHandler = patternHandler;
 		this.sourceImage = sourceHandler.getImage();
 		this.patternImage = patternHandler.getImage();
+		this.patternHash = patternHash;
 	}
 	
     @Override
     public void compare() {
-        PHash imageHash = new PHash();
-        
-        String patternHash = imageHash.getHash(patternImage);
-     
+
         // Become more lenient when dealing with GIF files
-        if (patternHandler.getType().equals(FILE_TYPE.GIF) || sourceHandler.getType().equals(FILE_TYPE.GIF)) {
-            PIXEL_COLOR_ERROR_MARGIN += 30;
+        if (patternHandler.getType().equals("gif") || sourceHandler.getType().equals("gif")) {
+        	PIXEL_COLOR_ERROR_MARGIN += 30;
             PHASH_DISTANCE_BUFFER += 45;
             AVERAGE_DIFFERENCE_BUFFER += 15;
         }
