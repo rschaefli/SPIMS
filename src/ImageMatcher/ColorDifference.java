@@ -14,7 +14,7 @@ public class ColorDifference {
     private int greenDifference;
     private int blueDifference;
     
-    public ColorDifference(int redDifference, int greenDifference, int BlueDifference) {
+    public ColorDifference(int redDifference, int greenDifference, int blueDifference) {
         this.redDifference = redDifference;
         this.greenDifference = greenDifference;
         this.blueDifference = blueDifference;
