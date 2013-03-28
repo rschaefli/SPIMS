@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.List;
 
-public class ImageComparator implements Comparator {
+public class ImageComparator {
 	
 	private ImageHandler sourceHandler;
 	private ImageHandler patternHandler;
@@ -22,7 +22,6 @@ public class ImageComparator implements Comparator {
 		this.patternHash = patternHash;
 	}
 	
-    @Override
     public void compare() {
         // Get our initial set of potential top left corners.
         PotentialMatchManager potentialMatchManager = new PotentialMatchManager(patternHandler, sourceHandler);
