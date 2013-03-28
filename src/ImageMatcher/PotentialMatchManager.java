@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 public class PotentialMatchManager {
 	
 	private int PIXEL_COLOR_ERROR_MARGIN = 5;
+	private int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 75;
     
 	private List<PotentialMatch> potentialTopLeftMatches;
 	private List<PotentialMatch> potentialTopRightMatches;
@@ -74,11 +75,15 @@ public class PotentialMatchManager {
     private void setPossibleCorners(int depth) {
     	BufferedImage patternImage = patternImageHandler.getImage();
     	BufferedImage sourceImage = sourceImageHandler.getImage();
+    	// Get the pixels from the patter image we will use to identify potential matches
+    	// with the source image below
         HashMap<Point, Color> topLeftImageColors = getPixelColors(patternImage, true, true, depth);
         HashMap<Point, Color> topRightImageColors = getPixelColors(patternImage, false, true, depth);
         HashMap<Point, Color> bottomLeftImageColors = getPixelColors(patternImage, true, false, depth);
         HashMap<Point, Color> bottomRightImageColors = getPixelColors(patternImage, false, false, depth);
-
+        
+        // Look through all the pixels in the source image to identify potential matches with
+        // the four corners of our patter image
         for (int i = 0; i <= sourceImage.getWidth() - patternImage.getWidth(); i++) {
             for (int j = 0; j <= sourceImage.getHeight() - patternImage.getHeight(); j++) {
                 addIfPotentialMatch(sourceImage, topLeftImageColors, i, j, potentialTopLeftMatches);
@@ -93,50 +98,24 @@ public class PotentialMatchManager {
 	private void addIfPotentialMatch(BufferedImage sourceImage, HashMap<Point, Color> cornerImageColors, int i, int j, List<PotentialMatch> corners) {
 		ColorDifference difference = new ColorDifference(0, 0, 0);
 		boolean isPotentialMatch = true;
-		int offPixelsToAllow = 5;
-		int offPixelCount = 0;
 		
 		//Loop through the pixels and see if we have any matches
 		for (Entry<Point, Color> entry : cornerImageColors.entrySet()) {
 		    Point p = entry.getKey();
 		    Color patternPixelColor = entry.getValue();
 
-		    Color sourcePixelColor = new Color(sourceImage.getRGB(i + p.x, j + p.y));
+		    Color sourcePixelColor = new Color(sourceImage.getRGB(p.x + i, p.y + j));
 
-		    if (!isColorCloseTo(patternPixelColor, sourcePixelColor)) {
-		        offPixelCount++;
-		    }
-		    
 		    difference.addColorDifference(differenceBetweenColors(patternPixelColor, sourcePixelColor));
-		    
-		    isPotentialMatch = isPotentialMatch && (offPixelCount < offPixelsToAllow);                   
 		}
+		
+		isPotentialMatch = difference.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE;  
 		
 		 // If we have a potential match, add to result
         if (isPotentialMatch) {
         	corners.add(new PotentialMatch(new Point(i, j), difference));
         }
 	}
-    
-    // Check if color c1s RGB values are all within errorMargin difference
-    // of c2s RGB values
-    private Boolean isColorCloseTo(Color c1, Color c2) {
-        int c1Red = c1.getRed();
-        int c2Red = c2.getRed();
-        boolean isRedInRange = (c1Red >= c2Red - PIXEL_COLOR_ERROR_MARGIN) && (c1Red <= c2Red + PIXEL_COLOR_ERROR_MARGIN);
-
-        int c1Green = c1.getGreen();
-        int c2Green = c2.getGreen();
-        boolean isGreenInRange = (c1Green >= c2Green - PIXEL_COLOR_ERROR_MARGIN) && (c1Green <= c2Green + PIXEL_COLOR_ERROR_MARGIN);
-
-        int c1Blue = c1.getBlue();
-        int c2Blue = c2.getBlue();
-        boolean isBlueInRange = (c1Blue >= c2Blue - PIXEL_COLOR_ERROR_MARGIN) && (c1Blue <= c2Blue + PIXEL_COLOR_ERROR_MARGIN);
-
-        return (isRedInRange && isGreenInRange) || (isRedInRange && isBlueInRange) || (isBlueInRange && isGreenInRange);
-        //(isRedInRange && isGreenInRange && isBlueInRange);
-
-    }
     
     private ColorDifference differenceBetweenColors(Color c1, Color c2){
         int r1 = c1.getRed();
@@ -169,13 +148,12 @@ public class PotentialMatchManager {
         result.put(new Point(startX, startY), new Color(image.getRGB(startX, startY)));
         
         
-        // THIS FUNCTION ONLY WORKS WITH A DEPTH OF 1 FOR NOW\
+        // THIS FUNCTION ONLY WORKS WITH A DEPTH OF 1 FOR NOW
         // ADDING TO THE DEPTH WILL RESULT IN SOME PIXELS BEING LEFT OUT THAT WE WANT TO INCLUDE
         while(depth > 0) {
         	startX += dirX;
         	result.put(new Point(startX , startY), new Color(image.getRGB(startX, startY)));
         	startX -= dirX;
-        			
         	startY += dirY;
         	result.put(new Point(startX , startY), new Color(image.getRGB(startX, startY)));
         	startX += dirX;

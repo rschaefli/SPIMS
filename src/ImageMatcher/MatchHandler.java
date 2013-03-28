@@ -20,7 +20,7 @@ public class MatchHandler {
 	// or the lowest difference that is lower than the highest acceptable difference
 	private List<Match> getMatchesToPrint() {
 		ArrayList<Match> matchesToPrint = new ArrayList<Match>();
-		Match bestNonExactMatch = new Match(null, null, new Point(0,0), 64);
+		Match bestNonExactMatch = null;
 		
 		// Try and get all the exact matches. We may get none and continue
         // below to add the best non-exact match
@@ -30,6 +30,7 @@ public class MatchHandler {
                 matchesToPrint.add(m);
             } else if(m.difference != -1 &&
             		  m.difference < Match.HIGHEST_ACCEPTABLE_DIFFERENCE &&
+            		  bestNonExactMatch != null &&
             		  m.difference < bestNonExactMatch.difference) {
             	bestNonExactMatch = m;
             }
@@ -37,7 +38,7 @@ public class MatchHandler {
 		
 		// Check if we have any matches to print.
 		// If not, add our best non-exact match
-		if(matchesToPrint.isEmpty()) {
+		if(matchesToPrint.isEmpty() && bestNonExactMatch != null) {
 			matchesToPrint.add(bestNonExactMatch);
 		}
 		

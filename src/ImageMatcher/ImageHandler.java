@@ -81,7 +81,6 @@ public class ImageHandler {
 	}
 
 	public void convertToGIF() {
-
 		if(!type.equals("gif")) {
 			BufferedImage gif = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = gif.createGraphics();
