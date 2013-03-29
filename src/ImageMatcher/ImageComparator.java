@@ -3,6 +3,7 @@ package ImageMatcher;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.List;
 
@@ -24,10 +25,12 @@ public class ImageComparator {
 	
     public void compare() {
         // Get our initial set of potential top left corners.
-        PotentialMatchManager potentialMatchManager = new PotentialMatchManager(patternHandler, sourceHandler);
+        CornerManager cornerManager = new CornerManager(patternHandler, sourceHandler);
+        
+        PotentialMatchManager matchManager = new PotentialMatchManager(cornerManager);
         
         // Get a map of Locations -> PHashes
-        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.getBestTopLeftMatches(25));
+        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, matchManager.findPotentialMatches());
         // Pass off our results to the match handler
         MatchHandler matchHandler = new MatchHandler();
         for (Entry<Point, String> entry : hashes.entrySet()) {
@@ -58,11 +61,11 @@ public class ImageComparator {
     
     // Get the PHashes of from a list of locations representing the top left corners of
     // potential matches within the source image
-    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, List<PotentialMatch> potentialMatches) {
+    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, LinkedList<PotentialMatch> potentialMatches) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 
         for (int i = 0; i < potentialMatches.size(); i++) {
-            Point location = potentialMatches.get(i).point;
+            Point location = potentialMatches.get(i).getLocation();
             hashes.put(location, getPHashOfSubImage(sourceImage, location, patternImage.getWidth(), patternImage.getHeight()));
         }
 

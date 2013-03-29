@@ -1,30 +1,51 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package ImageMatcher;
 
 import java.awt.Point;
 
-/**
- *
- * @author Dan
- */
-public class PotentialMatch implements Comparable<PotentialMatch> {
-    
-    public Point point;
-    public ColorDifference colorDifference;
-    
-    public PotentialMatch(Point point, ColorDifference colorDifference) {
-        this.point = point;
-        this.colorDifference = colorDifference;
-    }
-    
-    public int compareTo(PotentialMatch potentialMatch) {
-        int averageDifference = colorDifference.getAverageDifference();
-        int potentialMatchAverageDifference =  potentialMatch.colorDifference.getAverageDifference();
-        
-        return  averageDifference < potentialMatchAverageDifference ? -1 : averageDifference > potentialMatchAverageDifference ? 1 : 0;
-    }
-    
+public class PotentialMatch {
+
+	private Point location;
+	private int width;
+	private int height;
+	private double scaleApplied;
+	
+	public PotentialMatch(Point loc, int width, int height, double scaleApplied) {
+		this.location = loc;
+		this.width = width;
+		this.height = height;
+		this.scaleApplied = scaleApplied;
+	}
+	
+	public Point getLocation() {
+		return location;
+	}
+	
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	
+	public double getScaleApplied() {
+		return scaleApplied;
+	}
+	
+	public void setScaleApplied(double scaleApplied) {
+		this.scaleApplied = scaleApplied;
+	}
+	
 }
