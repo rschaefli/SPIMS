@@ -1,7 +1,6 @@
 package ImageMatcher;
 
 import java.awt.Point;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 public class PotentialMatchManager {
@@ -21,14 +20,11 @@ public class PotentialMatchManager {
 		
 		for(Corner topLeft : cornerManager.getBestTopLeftMatches(MATCH_COUNT)) {
 			for(Corner botRight : cornerManager.getBestBottomRightMatches(MATCH_COUNT)) {
-                            if(topLeft.getPoint().x == 604 && topLeft.getPoint().y == 708){
-                                System.out.println("YAY!");
-                            }
 				if(onSlope(topLeft.getPoint(), botRight.getPoint())) {
 					double scale = scaleFactor(topLeft.getPoint(), botRight.getPoint());
 					int width = (int) scale * patternImg().getWidth();
 					int height = (int) scale * patternImg().getHeight();
-                                        
+					
 					matches.add(new PotentialMatch(topLeft.getPoint(), width, height, scale));
 				}
 			}
@@ -38,9 +34,9 @@ public class PotentialMatchManager {
 	}
 	
 	private boolean onSlope(Point p1, Point p2) {
-            if(p1.x - p2.x == 0){
-                return false;
-            }
+        if(p1.x - p2.x == 0){
+            return false;
+        }
 		double pointSlope = (double) (p1.y - p2.y) / (double) (p1.x - p2.x);
 		return slope == pointSlope;
 	}

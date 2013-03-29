@@ -19,6 +19,8 @@ import java.util.Map.Entry;
  */
 public class CornerManager {
 	
+	private final static int PIXEL_COMPARISON_DEPTH = 1;
+	
 	private int PIXEL_COLOR_ERROR_MARGIN = 5;
 	private int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 75;
     
@@ -36,7 +38,7 @@ public class CornerManager {
     	potentialTopRightMatches = new ArrayList<Corner>();
     	potentialBottomLeftMatches = new ArrayList<Corner>();
     	potentialBottomRightMatches = new ArrayList<Corner>();
-    	setPossibleCorners(1);
+    	setPossibleCorners();
         
         // Become more lenient when dealing with GIF files
         if (this.patternImageHandler.getType().equals("gif") || this.sourceImageHandler.getType().equals("gif")) {
@@ -72,28 +74,39 @@ public class CornerManager {
     
     // Works in conjunction with getAxisColors to determine if there are potential
     // pattern image matches within a source image
-    private void setPossibleCorners(int depth) {
+    private void setPossibleCorners() {
     	BufferedImage patternImage = patternImageHandler.getImage();
     	BufferedImage sourceImage = sourceImageHandler.getImage();
     	// Get the pixels from the patter image we will use to identify potential matches
     	// with the source image below
-        HashMap<Point, Color> topLeftImageColors = getPixelColors(patternImage, true, true, depth);
-        HashMap<Point, Color> topRightImageColors = getPixelColors(patternImage, false, true, depth);
-        HashMap<Point, Color> bottomLeftImageColors = getPixelColors(patternImage, true, false, depth);
-        HashMap<Point, Color> bottomRightImageColors = getPixelColors(patternImage, false, false, depth);
+        HashMap<Point, Color> topLeftImageColors = getPixelColors(patternImage, true, true);
+        HashMap<Point, Color> topRightImageColors = getPixelColors(patternImage, false, true);
+        HashMap<Point, Color> bottomLeftImageColors = getPixelColors(patternImage, true, false);
+        HashMap<Point, Color> bottomRightImageColors = getPixelColors(patternImage, false, false);
         
         // Look through all the pixels in the source image to identify potential matches with
         // the four corners of our patter image
-        for (int i = 0; i <= sourceImage.getWidth() - patternImage.getWidth(); i++) {
-            for (int j = 0; j <= sourceImage.getHeight() - patternImage.getHeight(); j++) {
-                addIfPotentialMatch(sourceImage, topLeftImageColors, i, j, potentialTopLeftMatches);
-                addIfPotentialMatch(sourceImage, topRightImageColors, i, j, potentialTopRightMatches);
-                addIfPotentialMatch(sourceImage, bottomLeftImageColors, i, j, potentialBottomLeftMatches);
-                addIfPotentialMatch(sourceImage, bottomRightImageColors, i, j, potentialBottomRightMatches);
+        for (int i = 0; i < sourceImage.getWidth(); i++) {
+            for (int j = 0; j < sourceImage.getHeight(); j++) {
+            	if (i < sourceImage.getWidth() - PIXEL_COMPARISON_DEPTH &&
+            		j < sourceImage.getHeight() - PIXEL_COMPARISON_DEPTH) {
+            		addIfPotentialMatch(sourceImage, topLeftImageColors, i, j, potentialTopLeftMatches);
+            	}
+            	if (i > PIXEL_COMPARISON_DEPTH &&
+            		j < sourceImage.getHeight() - PIXEL_COMPARISON_DEPTH) {
+            		addIfPotentialMatch(sourceImage, topRightImageColors, i, j, potentialTopRightMatches);
+            	}
+            	if (i < sourceImage.getWidth() - PIXEL_COMPARISON_DEPTH &&
+            		j > PIXEL_COMPARISON_DEPTH) {
+            		addIfPotentialMatch(sourceImage, bottomLeftImageColors, i, j, potentialBottomLeftMatches);
+            	}
+            	if (i > PIXEL_COMPARISON_DEPTH &&
+            		j > PIXEL_COMPARISON_DEPTH) {
+            		addIfPotentialMatch(sourceImage, bottomRightImageColors, i, j, potentialBottomRightMatches);
+            	}
             }
         }
     }
-
 
 	private void addIfPotentialMatch(BufferedImage sourceImage, HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
 		ColorDifference difference = new ColorDifference(0, 0, 0);
@@ -136,7 +149,11 @@ public class CornerManager {
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential matches in the source image by checking more than 1 pixel
     // back on the left side of the second row.
-    private HashMap<Point, Color> getPixelColors(BufferedImage image, boolean searchRight, boolean searchDown, int depth) {
+    // NOTE:
+    // For scaling, we no longer want to include the pattern widths and heights in the points.
+    // Instead we just use relative points to what our corner would be, but get the correct
+    // pixel color value from the pattern image
+    private HashMap<Point, Color> getPixelColors(BufferedImage image, boolean searchRight, boolean searchDown) {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
         
         int dirX = searchRight ? 1 : -1;
@@ -145,19 +162,16 @@ public class CornerManager {
         int startY = searchDown ? 0 : image.getHeight() - 1;
         
         // Add our corner pixel
-        result.put(new Point(startX, startY), new Color(image.getRGB(startX, startY)));
+        result.put(new Point(0, 0), new Color(image.getRGB(startX, startY)));
         
+        int depth = PIXEL_COMPARISON_DEPTH;
         
         // THIS FUNCTION ONLY WORKS WITH A DEPTH OF 1 FOR NOW
         // ADDING TO THE DEPTH WILL RESULT IN SOME PIXELS BEING LEFT OUT THAT WE WANT TO INCLUDE
         while(depth > 0) {
-        	startX += dirX;
-        	result.put(new Point(startX , startY), new Color(image.getRGB(startX, startY)));
-        	startX -= dirX;
-        	startY += dirY;
-        	result.put(new Point(startX , startY), new Color(image.getRGB(startX, startY)));
-        	startX += dirX;
-        	result.put(new Point(startX , startY), new Color(image.getRGB(startX, startY)));
+        	result.put(new Point(dirX, 0), new Color(image.getRGB(startX + dirX, startY)));
+        	result.put(new Point(0, dirY), new Color(image.getRGB(startX, startY + dirY)));
+        	result.put(new Point(dirX , dirY), new Color(image.getRGB(startX + dirX, startY + dirY)));
         	
         	depth--;
         }
