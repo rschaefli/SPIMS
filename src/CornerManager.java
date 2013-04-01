@@ -136,7 +136,7 @@ public class CornerManager {
         // If depth is too big for this image, get the highest possible depth we can use
         if(image.getWidth() < PIXEL_COMPARISON_DEPTH ||
            image.getHeight() < PIXEL_COMPARISON_DEPTH) {
-        	depth = image.getWidth() < image.getHeight() ? image.getWidth() : image.getHeight();
+        	depth = (image.getWidth() < image.getHeight() ? image.getWidth() : image.getHeight()) - 1;
         }
         
         // Go as many pixels deep as we specify.
