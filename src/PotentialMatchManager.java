@@ -3,7 +3,7 @@ import java.util.LinkedList;
 
 public class PotentialMatchManager {
 
-	private final int MATCH_COUNT = 100;
+	private final int MATCH_COUNT = 5;
 	
 	private CornerManager cornerManager;
 	private double slope;
@@ -17,17 +17,13 @@ public class PotentialMatchManager {
 		LinkedList<PotentialMatch> potentialMatches = new LinkedList<PotentialMatch>();
 		
 		for(Corner topLeft : cornerManager.getBestTopLeftCorners(MATCH_COUNT)) {
-			for(Corner botRight : cornerManager.getBestBottomRightCorners(MATCH_COUNT)) {
-				if(onSlope(topLeft.getPoint(), botRight.getPoint())) {
-					double scale = scaleFactor(topLeft.getPoint(), botRight.getPoint());
-					int width = (int) (scale * patternImg().getWidth());
-					int height = (int) (scale * patternImg().getHeight());
-                    
-					//System.out.println(topLeft.getPoint().x + "," + topLeft.getPoint().y + " - " + width + "," + height + " - " + scale);
-					
-					potentialMatches.add(new PotentialMatch(topLeft.getPoint(), width, height, scale));
-				}
-			}
+			
+			System.out.println(topLeft.getPoint().x + "," + topLeft.getPoint().y + " - " + topLeft.getColorDifference().getAverageDifference());
+			
+			potentialMatches.add(new PotentialMatch(topLeft.getPoint(),
+													cornerManager.getPatternImageHandler().getImage().getWidth(),
+													cornerManager.getPatternImageHandler().getImage().getHeight(),
+													1));
 		}
 		
 		//System.out.println("Total potential matches: " + potentialMatches.size());

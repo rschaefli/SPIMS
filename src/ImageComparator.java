@@ -37,7 +37,7 @@ public class ImageComparator {
             
             Match m = new Match(patternHandler, sourceHandler, location, difference);
             if(m.isMatch()) {
-            	//System.out.println("Match found @ " + location.x + "," + location.y);
+            	//System.out.println("Match found @ " + location.x + "," + location.y + "- " + difference);
             	matchHandler.add(m);
             }
         }

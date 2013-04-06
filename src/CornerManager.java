@@ -13,8 +13,8 @@ import java.util.Map.Entry;
  */
 public class CornerManager {
 	
-	private final static int PIXEL_COMPARISON_DEPTH = 10;
-	private final static int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 50;
+	private static int PIXEL_COMPARISON_DEPTH = 15;
+	private static int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 40;
     
 	private List<Corner> potentialTopLeftCorners;
 	private List<Corner> potentialTopRightCorners;
@@ -29,7 +29,7 @@ public class CornerManager {
     	potentialTopLeftCorners = new ArrayList<Corner>();
     	potentialTopRightCorners = new ArrayList<Corner>();
     	potentialBottomLeftCorners = new ArrayList<Corner>();
-    	potentialBottomRightCorners = new ArrayList<Corner>();
+    	potentialBottomRightCorners = new ArrayList<Corner>();	
     	setPossibleCorners();
     }
     
@@ -64,37 +64,21 @@ public class CornerManager {
     	BufferedImage sourceImage = sourceImageHandler.getImage();
     	// Get the pixels from the pattern image we will use to identify potential corners
         HashMap<Point, Color> topLeftImageColors = getPixelColors(true, true);
-        HashMap<Point, Color> topRightImageColors = getPixelColors(false, true);
-        HashMap<Point, Color> bottomLeftImageColors = getPixelColors(true, false);
-        HashMap<Point, Color> bottomRightImageColors = getPixelColors(false, false);
         
         // Look through all the pixels in the source image to identify potential corners with
         // the corners of our pattern image
-        for (int i = 0; i < sourceImage.getWidth(); i++) {
-            for (int j = 0; j < sourceImage.getHeight(); j++) {
-            	if (i < sourceImage.getWidth() - PIXEL_COMPARISON_DEPTH &&
-            		j < sourceImage.getHeight() - PIXEL_COMPARISON_DEPTH) {
-            		addIfPotentialCorner(sourceImage, topLeftImageColors, i, j, potentialTopLeftCorners);
-            	}
-            	if (i > PIXEL_COMPARISON_DEPTH &&
-            		j < sourceImage.getHeight() - PIXEL_COMPARISON_DEPTH) {
-            		//addIfPotentialCorner(sourceImage, topRightImageColors, i, j, potentialTopRightCorners);
-            	}
-            	if (i < sourceImage.getWidth() - PIXEL_COMPARISON_DEPTH &&
-            		j > PIXEL_COMPARISON_DEPTH) {
-            		//addIfPotentialCorner(sourceImage, bottomLeftImageColors, i, j, potentialBottomLeftCorners);
-            	}
-            	if (i > PIXEL_COMPARISON_DEPTH &&
-            		j > PIXEL_COMPARISON_DEPTH) {
-            		addIfPotentialCorner(sourceImage, bottomRightImageColors, i, j, potentialBottomRightCorners);
-            	}
+        for (int i = 0; i <= sourceImage.getWidth() - patternImageHandler.getWidth(); i++) {
+            for (int j = 0; j <= sourceImage.getHeight() - patternImageHandler.getHeight(); j++) {
+
+            	addIfPotentialCorner(sourceImage, topLeftImageColors, i, j, potentialTopLeftCorners);
+            	
             }
         }
     }
 
     // Compare pixels and if this corner is a potential match then add it to corners
 	private void addIfPotentialCorner(BufferedImage sourceImage, HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
-		ColorDifference difference = new ColorDifference(0, 0, 0);
+		ColorDifference difference = new ColorDifference();
 		boolean isPotentialCorner = true;
 		
 		//Loop through the pixels and see if we have any matches
@@ -105,9 +89,18 @@ public class CornerManager {
 		    Color sourcePixelColor = new Color(sourceImage.getRGB(p.x + i, p.y + j));
 		    
 		    difference.addColorDifference(patternPixelColor, sourcePixelColor);
+		    
+		    // If we ever breach the threshold, stop looking!
+		    if (difference.getAverageDifference() > MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE) {
+		    	break;
+		    }
 		}
 		
-		isPotentialCorner = difference.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE;  
+		isPotentialCorner = difference.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE; 
+		
+//		if (i == 730 && j == 190) {
+//			System.out.println("Potential match found at " + i + "," + j + " - " + difference.getAverageDifference());
+//		}
 		
 		 // If we have a potential corner, add to result
         if (isPotentialCorner) {
@@ -136,15 +129,20 @@ public class CornerManager {
         // If depth is too big for this image, get the highest possible depth we can use
         if(image.getWidth() < PIXEL_COMPARISON_DEPTH ||
            image.getHeight() < PIXEL_COMPARISON_DEPTH) {
-        	depth = (image.getWidth() < image.getHeight() ? image.getWidth() : image.getHeight()) - 1;
-        }
-        
-        // Go as many pixels deep as we specify.
-        while(depth > 0) {
-        	result.put(new Point(dirX * depth, dirY * depth),
-        			   new Color(image.getRGB(startX + (dirX * depth), startY + (dirY * depth))));
+        	for(int x=0;x<image.getWidth();x++){
+        		for(int y=0;y<image.getHeight();y++) {
+        			result.put(new Point(x,y), new Color(image.getRGB(x,y)));
+        		}
+        	}
         	
-        	depth--;
+        } else {
+        	// Go as many pixels deep as we specify.
+            while(depth > 0) {
+            	result.put(new Point(dirX * depth, dirY * depth),
+            			   new Color(image.getRGB(startX + (dirX * depth), startY + (dirY * depth))));
+            	
+            	depth--;
+            }
         }
         
         return result;

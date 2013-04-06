@@ -14,11 +14,6 @@ public class Match {
 		this.sourceHandler = sourceHandler;
 		this.location = location;
 		this.difference = difference;
-		
-		// Become more lenient when dealing with GIF files
-        if (this.patternHandler.getType().equals("gif") || this.sourceHandler.getType().equals("gif")) {
-        	HIGHEST_ACCEPTABLE_DIFFERENCE += 45;
-        }
 	}
 	
 	public boolean isMatch() {
