@@ -29,7 +29,6 @@ public class ColorDifference {
         int b2 = c2.getBlue();
         int b = Math.abs(b2 - b1);
         
-        
         this.difference += Math.sqrt(Math.pow(r, 2) + Math.pow(g, 2) + Math.pow(b, 2));
         this.totalPixels += 1;
     }

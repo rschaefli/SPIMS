@@ -18,7 +18,7 @@ public class PotentialMatchManager {
 		
 		for(Corner topLeft : cornerManager.getBestTopLeftCorners(MATCH_COUNT)) {
 			
-			System.out.println(topLeft.getPoint().x + "," + topLeft.getPoint().y + " - " + topLeft.getColorDifference().getAverageDifference());
+			//System.out.println(topLeft.getPoint().x + "," + topLeft.getPoint().y + " - " + topLeft.getColorDifference().getAverageDifference());
 			
 			potentialMatches.add(new PotentialMatch(topLeft.getPoint(),
 													cornerManager.getPatternImageHandler().getImage().getWidth(),

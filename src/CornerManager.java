@@ -102,7 +102,7 @@ public class CornerManager {
 //			System.out.println("Potential match found at " + i + "," + j + " - " + difference.getAverageDifference());
 //		}
 		
-		 // If we have a potential corner, add to result
+		// If we have a potential corner, add to result
         if (isPotentialCorner) {
         	corners.add(new Corner(new Point(i, j), difference));
         }
@@ -126,7 +126,7 @@ public class CornerManager {
         result.put(new Point(0, 0), new Color(image.getRGB(startX, startY)));
 
         int depth = PIXEL_COMPARISON_DEPTH;
-        // If depth is too big for this image, get the highest possible depth we can use
+        // If depth is too big for this image, get all pixels from image
         if(image.getWidth() < PIXEL_COMPARISON_DEPTH ||
            image.getHeight() < PIXEL_COMPARISON_DEPTH) {
         	for(int x=0;x<image.getWidth();x++){
@@ -134,7 +134,6 @@ public class CornerManager {
         			result.put(new Point(x,y), new Color(image.getRGB(x,y)));
         		}
         	}
-        	
         } else {
         	// Go as many pixels deep as we specify.
             while(depth > 0) {
