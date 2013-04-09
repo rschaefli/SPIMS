@@ -24,12 +24,12 @@ public class ImageComparator {
         // Get our initial set of potential top left corners.
         CornerManager cornerManager = new CornerManager(patternHandler, sourceHandler);
         
-        PotentialMatchManager matchManager = new PotentialMatchManager(cornerManager);
+        PotentialMatchManager potentialMatchManager = new PotentialMatchManager(cornerManager);
         
         // Get a map of Locations -> PHashes
-        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, matchManager.findPotentialMatches());
+        HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.findPotentialMatches());
         // Pass off our results to the match handler
-        MatchHandler matchHandler = new MatchHandler();
+        MatchManager matchManager = new MatchManager();
         for (Entry<Point, String> entry : hashes.entrySet()) {
             Point location = entry.getKey();
             String subimageHash = entry.getValue();
@@ -38,12 +38,12 @@ public class ImageComparator {
             Match m = new Match(patternHandler, sourceHandler, location, difference);
             if(m.isMatch()) {
             	//System.out.println("Match found @ " + location.x + "," + location.y + "- " + difference);
-            	matchHandler.add(m);
+            	matchManager.add(m);
             }
         }
         
         // Print out our matches
-        matchHandler.printMatches();
+        matchManager.printMatches();
     }
     
     

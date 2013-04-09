@@ -13,49 +13,32 @@ import java.util.Map.Entry;
  */
 public class CornerManager {
 	
-	private static int PIXEL_COMPARISON_DEPTH = 15;
+	private static int PIXEL_COMPARISON_DEPTH = 3;		// Note we go down to 0, so 3 deep
+														// actually means 4 on each corner
 	private static int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 40;
     
 	private List<Corner> potentialTopLeftCorners;
-	private List<Corner> potentialTopRightCorners;
-	private List<Corner> potentialBottomLeftCorners;
-	private List<Corner> potentialBottomRightCorners;
     private ImageHandler patternImageHandler;
     private ImageHandler sourceImageHandler;
+    
+    public boolean exactMatch = false;					// Flag to indicate whether we want to exactly
+    													// match this image or not
     
     public CornerManager(ImageHandler patternImageHandler, ImageHandler sourceImageHandler) {
     	this.patternImageHandler = patternImageHandler;
     	this.sourceImageHandler = sourceImageHandler;
     	potentialTopLeftCorners = new ArrayList<Corner>();
-    	potentialTopRightCorners = new ArrayList<Corner>();
-    	potentialBottomLeftCorners = new ArrayList<Corner>();
-    	potentialBottomRightCorners = new ArrayList<Corner>();	
     	setPossibleCorners();
     }
     
-    // Get the best howMany potential corners
-    public List<Corner> getBestTopLeftCorners(int howMany) {
-        return getBestCorners(howMany, potentialTopLeftCorners);
-    }
-    public List<Corner> getBestTopRightCorners(int howMany) {
-        return getBestCorners(howMany, potentialTopRightCorners);
-    }
-    public List<Corner> getBestBottomLeftCorners(int howMany) {
-        return getBestCorners(howMany, potentialBottomLeftCorners);
-    }
-    public List<Corner> getBestBottomRightCorners(int howMany) {
-        return getBestCorners(howMany, potentialBottomRightCorners);
-    }
-    
     // Get the best howMany potential corners from a list of potential corners
-    public List<Corner> getBestCorners(int howMany, List<Corner> corners) {
-        Collections.sort(corners);
-        
-        if (howMany > corners.size()) {
-            return corners;
+    // At this point, corners should already be sorted
+    public List<Corner> getBestTopLeftCorners(int howMany) {
+        if (howMany > potentialTopLeftCorners.size()) {
+            return potentialTopLeftCorners;
         }
         else {
-            return corners.subList(0, howMany);
+            return potentialTopLeftCorners.subList(0, howMany);
         }
     }
     
@@ -63,23 +46,42 @@ public class CornerManager {
     private void setPossibleCorners() {
     	BufferedImage sourceImage = sourceImageHandler.getImage();
     	// Get the pixels from the pattern image we will use to identify potential corners
-        HashMap<Point, Color> topLeftImageColors = getPixelColors(true, true);
+        HashMap<Point, Color> topLeftImageColors = getPixelColors();
         
         // Look through all the pixels in the source image to identify potential corners with
         // the corners of our pattern image
         for (int i = 0; i <= sourceImage.getWidth() - patternImageHandler.getWidth(); i++) {
             for (int j = 0; j <= sourceImage.getHeight() - patternImageHandler.getHeight(); j++) {
 
-            	addIfPotentialCorner(sourceImage, topLeftImageColors, i, j, potentialTopLeftCorners);
+            	addIfPotentialCorner(topLeftImageColors, i, j, potentialTopLeftCorners);
             	
             }
         }
+        
+        // Finally sort the corners. We do this here to prevent sorting multiple
+        // times in the case where getBestCorners is called more than once.
+        Collections.sort(potentialTopLeftCorners);
     }
 
     // Compare pixels and if this corner is a potential match then add it to corners
-	private void addIfPotentialCorner(BufferedImage sourceImage, HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
+	private void addIfPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
+		// Get the color difference for this potential corner
+		ColorDifference colorDifferenceForCorner = getColorDifferenceForPotentialCorner(cornerImageColors, i, j);
+		
+		// Is this a potential corner based on our criteria?
+		boolean isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE; 
+		
+		// If we have a potential corner, add to result
+        if (isPotentialCorner) {
+        	corners.add(new Corner(new Point(i, j), colorDifferenceForCorner));
+        }
+	}
+	
+	// Gets the color difference of all our pattern image colors compared to their
+	// respective source image colors
+	private ColorDifference getColorDifferenceForPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j) {
+		BufferedImage sourceImage = sourceImageHandler.getImage();
 		ColorDifference difference = new ColorDifference();
-		boolean isPotentialCorner = true;
 		
 		//Loop through the pixels and see if we have any matches
 		for (Entry<Point, Color> entry : cornerImageColors.entrySet()) {
@@ -96,49 +98,42 @@ public class CornerManager {
 		    }
 		}
 		
-		isPotentialCorner = difference.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE; 
-		
-//		if (i == 730 && j == 190) {
-//			System.out.println("Potential match found at " + i + "," + j + " - " + difference.getAverageDifference());
-//		}
-		
-		// If we have a potential corner, add to result
-        if (isPotentialCorner) {
-        	corners.add(new Corner(new Point(i, j), difference));
-        }
+		return difference;
 	}
     
     // This is used to elaborate on just comparing the top left pixel of sub images
     // The goal is to get less potential corners in the source image by checking more than 1 pixel
     // back on the left side of the second row.
     // Get pixels along the diagonal of the pattern image
-    private HashMap<Point, Color> getPixelColors(boolean searchRight, boolean searchDown) {
+    private HashMap<Point, Color> getPixelColors() {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
         BufferedImage image = patternImageHandler.getImage();
-        
-        int dirX = searchRight ? 1 : -1;
-        int dirY = searchDown ? 1 : -1;
-        int startX = searchRight ? 0 : image.getWidth() - 1;
-        int startY = searchDown ? 0 : image.getHeight() - 1;
-        
-        // Add our starting corner pixel
-        // When depth is 0 we are still getting 1 pixel to compare
-        result.put(new Point(0, 0), new Color(image.getRGB(startX, startY)));
+        int width = image.getWidth() - 1;
+        int height = image.getHeight() - 1;
 
         int depth = PIXEL_COMPARISON_DEPTH;
         // If depth is too big for this image, get all pixels from image
-        if(image.getWidth() < PIXEL_COMPARISON_DEPTH ||
-           image.getHeight() < PIXEL_COMPARISON_DEPTH) {
+        if(image.getWidth() < PIXEL_COMPARISON_DEPTH * 2 ||
+           image.getHeight() < PIXEL_COMPARISON_DEPTH * 2) {
         	for(int x=0;x<image.getWidth();x++){
         		for(int y=0;y<image.getHeight();y++) {
         			result.put(new Point(x,y), new Color(image.getRGB(x,y)));
         		}
         	}
         } else {
-        	// Go as many pixels deep as we specify.
-            while(depth > 0) {
-            	result.put(new Point(dirX * depth, dirY * depth),
-            			   new Color(image.getRGB(startX + (dirX * depth), startY + (dirY * depth))));
+        	// Go as many pixels deep as we specify on all 4 corners
+            while(depth >= 0) {
+            	// Top left
+            	result.put(new Point(depth, depth), new Color(image.getRGB(depth, depth)));
+            	
+            	// Top right
+            	result.put(new Point(width-depth, depth), new Color(image.getRGB(width-depth, depth)));
+            	
+            	// Bottom left
+            	result.put(new Point(depth, height-depth), new Color(image.getRGB(depth, height-depth)));
+            	
+            	// Bottom right
+            	result.put(new Point(width-depth, height-depth), new Color(image.getRGB(width-depth, height-depth)));
             	
             	depth--;
             }
