@@ -5,11 +5,11 @@ import java.util.concurrent.Executors;
 
 public class SPIMS {
 
-	// Specifies the desired number of comparison threads
-	private final static int NUM_THREADS = 4;
+	// Set number of comparison threads to number of cores
+	private final static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 	
 	public static void main(String[] args) {
-
+		
     	// Validate Input Parameters
 		ParameterHandler ph = new ParameterHandler(args);
 		ArrayList<File> patternImgs = ph.getPatterns();
