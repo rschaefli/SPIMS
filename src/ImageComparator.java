@@ -1,7 +1,7 @@
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class ImageComparator {
@@ -59,7 +59,7 @@ public class ImageComparator {
     
     // Get the PHashes of from a list of locations representing the top left corners of
     // potential matches within the source image
-    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, LinkedList<PotentialMatch> potentialMatches) {
+    private HashMap<Point, String> getPHashesOfLocations(BufferedImage sourceImage, List<PotentialMatch> potentialMatches) {
         HashMap<Point, String> hashes = new HashMap<Point, String>();
 
         for (int i = 0; i < potentialMatches.size(); i++) {

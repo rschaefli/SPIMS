@@ -1,4 +1,5 @@
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PotentialMatchManager {
 	
@@ -10,8 +11,8 @@ public class PotentialMatchManager {
 		this.matchCount = matchCount;
 	}
 		
-	public LinkedList<PotentialMatch> findPotentialMatches() {
-		LinkedList<PotentialMatch> potentialMatches = new LinkedList<PotentialMatch>();
+	public List<PotentialMatch> findPotentialMatches() {
+		ArrayList<PotentialMatch> potentialMatches = new ArrayList<PotentialMatch>();
 		
 		for(Corner topLeft : cornerManager.getBestTopLeftCorners(matchCount)) {
 			
