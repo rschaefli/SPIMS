@@ -5,13 +5,11 @@ public class PotentialMatch {
 	private Point location;
 	private int width;
 	private int height;
-	private double scaleApplied;
 	
-	public PotentialMatch(Point loc, int width, int height, double scaleApplied) {
+	public PotentialMatch(Point loc, int width, int height) {
 		this.location = loc;
 		this.width = width;
 		this.height = height;
-		this.scaleApplied = scaleApplied;
 	}
 	
 	public Point getLocation() {
@@ -37,13 +35,4 @@ public class PotentialMatch {
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	
-	public double getScaleApplied() {
-		return scaleApplied;
-	}
-	
-	public void setScaleApplied(double scaleApplied) {
-		this.scaleApplied = scaleApplied;
-	}
-	
 }

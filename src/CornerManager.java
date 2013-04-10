@@ -15,14 +15,11 @@ public class CornerManager {
 	
 	private static int PIXEL_COMPARISON_DEPTH = 3;		// Note we go down to 0, so 3 deep
 														// actually means 4 on each corner
-	private static int MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE = 40;
+	private static int MAX_AVERAGE_COLOR_DIFFERENCE = 40;
     
 	private List<Corner> potentialTopLeftCorners;
     private ImageHandler patternImageHandler;
     private ImageHandler sourceImageHandler;
-    
-    public boolean exactMatch = false;					// Flag to indicate whether we want to exactly
-    													// match this image or not
     
     public CornerManager(ImageHandler patternImageHandler, ImageHandler sourceImageHandler) {
     	this.patternImageHandler = patternImageHandler;
@@ -67,9 +64,8 @@ public class CornerManager {
 	private void addIfPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
 		// Get the color difference for this potential corner
 		ColorDifference colorDifferenceForCorner = getColorDifferenceForPotentialCorner(cornerImageColors, i, j);
-		
-		// Is this a potential corner based on our criteria?
-		boolean isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE; 
+
+		boolean isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE; 
 		
 		// If we have a potential corner, add to result
         if (isPotentialCorner) {
@@ -93,7 +89,7 @@ public class CornerManager {
 		    difference.addColorDifference(patternPixelColor, sourcePixelColor);
 		    
 		    // If we ever breach the threshold, stop looking!
-		    if (difference.getAverageDifference() > MAX_ALLOWABLE_AVERAGE_COLOR_DIFFERENCE) {
+		    if (difference.getAverageDifference() > MAX_AVERAGE_COLOR_DIFFERENCE) {
 		    	break;
 		    }
 		}

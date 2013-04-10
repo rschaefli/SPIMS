@@ -25,8 +25,6 @@ public class ImageHandler {
 	private boolean validImg = false;       // Is Handled Image Valid?
 	private String type = null;			    // Image Type			
 	private String name = "";				// Image Name
-	private double aspectRatio = 0;
-	private double cornerDist = 0;
 	private final ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
 		add("gif"); 
 		add("jpeg");
@@ -61,8 +59,6 @@ public class ImageHandler {
 					name = imageFile.getName();
 					validImg = true;
 					type = fileType;
-					aspectRatio = (double) image.getHeight() / (double) image.getWidth();
-					cornerDist = Point.distance(0, 0, image.getWidth(), image.getHeight());
 				} else {
 					System.err.println("Invalid image type @ " + imageFile.getAbsolutePath());
 					System.exit(1);
@@ -164,21 +160,5 @@ public class ImageHandler {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public double getAspectRatio() {
-		return aspectRatio;
-	}
-
-	public void setAspectRatio(double aspectRatio) {
-		this.aspectRatio = aspectRatio;
-	}
-
-	public double getCornerDist() {
-		return cornerDist;
-	}
-
-	public void setCornerDist(double cornerDist) {
-		this.cornerDist = cornerDist;
 	}
 }

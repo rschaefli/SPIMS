@@ -24,7 +24,7 @@ public class ImageComparator {
         // Get our initial set of potential top left corners.
         CornerManager cornerManager = new CornerManager(patternHandler, sourceHandler);
         
-        PotentialMatchManager potentialMatchManager = new PotentialMatchManager(cornerManager);
+        PotentialMatchManager potentialMatchManager = new PotentialMatchManager(cornerManager, 100);
         
         // Get a map of Locations -> PHashes
         HashMap<Point, String> hashes = getPHashesOfLocations(sourceImage, potentialMatchManager.findPotentialMatches());
