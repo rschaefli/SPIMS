@@ -21,20 +21,19 @@ public class MatchManager {
 		Match bestNonExactMatch = null;
 		
 		// Try and get all the exact matches. We may get none and continue
-                // below to add the best non-exact match
+		// below to add the best non-exact match
 		for(Match m : matches) {
-		     //If exact match print out
-                     if(m.difference == 0){
-                          matchesToPrint.add(m);
-                     } else if(m.difference != -1 
-                               && m.difference < Match.HIGHEST_ACCEPTABLE_DIFFERENCE) {
-            	          // Set our new best non exact match
-            	          if(bestNonExactMatch == null) {
-            		       bestNonExactMatch = m;
-            	          } else if(m.difference < bestNonExactMatch.difference) {
-            		       bestNonExactMatch = m;
-            	          }
-                    }
+			//If exact match print out
+	        if(m.difference == 0){
+	        	matchesToPrint.add(m);
+	        } else if(m.difference != -1 && m.difference < Match.HIGHEST_ACCEPTABLE_DIFFERENCE) {
+	        	// Set our new best non exact match
+	        	if(bestNonExactMatch == null) {
+	        		bestNonExactMatch = m;
+	        	} else if(m.difference < bestNonExactMatch.difference) {
+	        		bestNonExactMatch = m;
+	        	}
+	        }
 		}
 		
 		// Check if we have any matches to print.
