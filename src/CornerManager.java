@@ -28,14 +28,17 @@ public class CornerManager {
     	setPossibleCorners();
     }
     
-    // Get the best howMany potential corners from a list of potential corners
-    // At this point, corners should already be sorted
-    public List<Corner> getBestTopLeftCorners(int howMany) {
-        if (howMany > potentialTopLeftCorners.size()) {
-            return potentialTopLeftCorners;
+    // Get a range of top left corners from index start to start+howMany
+    // At this point, corners must already be sorted
+    public List<Corner> getRangeOfTopLeftCorners(int start, int howMany) {
+    	if (start > potentialTopLeftCorners.size()) {
+    		return new ArrayList<Corner>();
+    	}
+    	else if (start+howMany > potentialTopLeftCorners.size()) {
+            return potentialTopLeftCorners.subList(start, potentialTopLeftCorners.size());
         }
         else {
-            return potentialTopLeftCorners.subList(0, howMany);
+            return potentialTopLeftCorners.subList(start, start+howMany);
         }
     }
     
