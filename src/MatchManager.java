@@ -32,7 +32,7 @@ public class MatchManager {
 	        		matchesToPrint.add(m);
 	        	}
 	        // Else we check to set our best acceptable non-exact match
-	        } else if(m.difference != -1 && m.difference < Match.HIGHEST_ACCEPTABLE_DIFFERENCE) {
+	        } else {
 	        	if(bestNonExactMatch == null) {
 	        		bestNonExactMatch = m;
 	        	} else if(m.difference < bestNonExactMatch.difference) {

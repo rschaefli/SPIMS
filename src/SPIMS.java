@@ -24,4 +24,3 @@ public class SPIMS {
 		executor.shutdown();		
 	}
 }
-

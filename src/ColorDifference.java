@@ -1,9 +1,5 @@
 import java.awt.Color;
 
-/**
- *
- * @author Dan
- */
 public class ColorDifference {
     private int difference;
     private int totalPixels;

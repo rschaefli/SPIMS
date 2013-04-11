@@ -49,5 +49,4 @@ public class ComparisonThread implements Runnable {
 			}
 		}
 	}
-	
 }

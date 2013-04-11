@@ -21,9 +21,6 @@ public class PotentialMatchManager {
 		ArrayList<PotentialMatch> potentialMatches = new ArrayList<PotentialMatch>();
 		
 		for(Corner topLeft : cornerManager.getRangeOfTopLeftCorners(currentCornerIndex, batchSize)) {
-			
-			//System.out.println(topLeft.getPoint().x + "," + topLeft.getPoint().y + " - " + topLeft.getColorDifference().getAverageDifference());
-			
 			String potentialMatchPHash = getPHashOfSubImage(cornerManager.getSourceImageHandler().getImage(),
 															topLeft.getPoint(),
 															cornerManager.getPatternImageHandler().getImage().getWidth(),
@@ -50,6 +47,4 @@ public class PotentialMatchManager {
         
         return hash;
     }
-	
-	
 }

@@ -2,7 +2,7 @@ import java.awt.Point;
 
 public class Match {
 	
-	public static int HIGHEST_ACCEPTABLE_DIFFERENCE = 5;
+	private final static int HIGHEST_ACCEPTABLE_DIFFERENCE = 5;
 	
 	public ImageHandler patternHandler;
 	public ImageHandler sourceHandler;

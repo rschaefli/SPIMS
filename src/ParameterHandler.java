@@ -4,6 +4,7 @@ import java.util.ArrayList;
 /**
  * Handles Input Parameter Validation
  */
+@SuppressWarnings("serial")
 public class ParameterHandler {
 
 	private ArrayList<File> patterns = new ArrayList<File>();

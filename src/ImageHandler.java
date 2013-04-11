@@ -1,8 +1,6 @@
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,13 +10,12 @@ import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
 
 /**
  * Handles File to BufferedImage validation and conversion
  */
+@SuppressWarnings("serial")
 public class ImageHandler {
 
 	private BufferedImage image = null;     // Handled Image
@@ -78,31 +75,6 @@ public class ImageHandler {
 		} catch (IOException e) {
 			System.err.println("Error reading file @ " + imageFile.getAbsolutePath());
 			System.exit(1);
-		}
-	}
-
-	public void convertToGIF() {
-
-		if(!type.equals("gif")) {
-			BufferedImage gif = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g = gif.createGraphics();
-			g.drawImage(image,0,0,null);
-			g.dispose();
-			
-			ImageWriter write = ImageIO.getImageWritersBySuffix("gif").next();
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			try {
-				ImageOutputStream imageos = ImageIO.createImageOutputStream(out);
-				write.setOutput(imageos);
-				write.write(gif);
-				imageos.flush();
-				
-				image = gif;
-				type = "gif";
-			} catch (IOException e) {
-				System.err.println("Error Converting to GIF");
-				System.exit(1);
-			}
 		}
 	}
 

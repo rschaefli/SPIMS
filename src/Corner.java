@@ -1,9 +1,5 @@
 import java.awt.Point;
 
-/**
- *
- * @author Dan
- */
 public class Corner implements Comparable<Corner> {
     
     private Point point;
@@ -28,5 +24,4 @@ public class Corner implements Comparable<Corner> {
 	public ColorDifference getColorDifference() {
 		return colorDifference;
 	}
-     
 }

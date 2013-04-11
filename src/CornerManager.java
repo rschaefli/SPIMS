@@ -7,13 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-/**
- *
- * @author Dan
- */
 public class CornerManager {
 	
-	private static int PIXEL_COMPARISON_DEPTH = 3;		// Note we go down to 0, so 3 deep
+	private static int PIXEL_COMPARISON_DEPTH = 3;		// Note that we go down to 0, so 3 deep
 														// actually means 4 on each corner
 	private static int MAX_AVERAGE_COLOR_DIFFERENCE = 40;
     
