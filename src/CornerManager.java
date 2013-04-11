@@ -9,9 +9,10 @@ import java.util.Map.Entry;
 
 public class CornerManager {
 	
-	private static int PIXEL_COMPARISON_DEPTH = 3;		// Note that we go down to 0, so 3 deep
-														// actually means 4 on each corner
-	private static int MAX_AVERAGE_COLOR_DIFFERENCE = 40;
+	private final static int PIXEL_COMPARISON_DEPTH = 3; // Note that we go down to 0, so 3 deep
+														 // actually means 4 on each corner
+	private final static int MAX_AVERAGE_COLOR_DIFFERENCE = 40;
+	private final static int MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE = 18;
     
 	private List<Corner> potentialTopLeftCorners;
     private ImageHandler patternImageHandler;
@@ -63,8 +64,15 @@ public class CornerManager {
 	private void addIfPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j, List<Corner> corners) {
 		// Get the color difference for this potential corner
 		ColorDifference colorDifferenceForCorner = getColorDifferenceForPotentialCorner(cornerImageColors, i, j);
-
-		boolean isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE; 
+		boolean isPotentialCorner;
+		
+		// If we are comparing every single pixel (small images)
+		// we want to reduce the max average color difference we allow.
+		if(cornerImageColors.size() == patternImageHandler.getHeight() * patternImageHandler.getWidth()) {
+			isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE; 
+		} else {
+			isPotentialCorner = colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE; 
+		}
 		
 		// If we have a potential corner, add to result
         if (isPotentialCorner) {
@@ -78,7 +86,7 @@ public class CornerManager {
 		BufferedImage sourceImage = sourceImageHandler.getImage();
 		ColorDifference difference = new ColorDifference();
 		
-		//Loop through the pixels and see if we have any matches
+		// Loop through the pixels and compute the ColorDifference
 		for (Entry<Point, Color> entry : cornerImageColors.entrySet()) {
 		    Point p = entry.getKey();
 		    Color patternPixelColor = entry.getValue();

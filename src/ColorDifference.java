@@ -1,14 +1,14 @@
 import java.awt.Color;
 
 public class ColorDifference {
-    private int difference;
+    private float difference;
     private int totalPixels;
     
     public ColorDifference() {
         this.totalPixels = 1;
     }
     
-    public int getAverageDifference() {
+    public float getAverageDifference() {
         return this.difference / totalPixels;
     }
     

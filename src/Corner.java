@@ -11,8 +11,8 @@ public class Corner implements Comparable<Corner> {
     }
     
     public int compareTo(Corner potentialMatch) {
-        int averageDifference = colorDifference.getAverageDifference();
-        int potentialMatchAverageDifference =  potentialMatch.colorDifference.getAverageDifference();
+        float averageDifference = colorDifference.getAverageDifference();
+        float potentialMatchAverageDifference =  potentialMatch.colorDifference.getAverageDifference();
         
         return  averageDifference < potentialMatchAverageDifference ? -1 : averageDifference > potentialMatchAverageDifference ? 1 : 0;
     }
