@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +24,15 @@ public class MatchManager {
 		// Try and get all the exact matches. We may get none and continue
 		// below to add the best non-exact match
 		for(Match m : matches) {
-			//If exact match print out
+			// If exact match print out
 	        if(m.difference == 0){
-	        	matchesToPrint.add(m);
+	        	// This is the only case where we will have multiple matches
+	        	// Therefore we only need to check for overlap in matches here.
+	        	if(!isOverlappingMatch(m, matchesToPrint)) {
+	        		matchesToPrint.add(m);
+	        	}
+	        // Else we check to set our best acceptable non-exact match
 	        } else if(m.difference != -1 && m.difference < Match.HIGHEST_ACCEPTABLE_DIFFERENCE) {
-	        	// Set our new best non exact match
 	        	if(bestNonExactMatch == null) {
 	        		bestNonExactMatch = m;
 	        	} else if(m.difference < bestNonExactMatch.difference) {
@@ -43,6 +48,23 @@ public class MatchManager {
 		}
 		
 		return matchesToPrint;
+	}
+	
+	// Check this match with the other matches we will print out to
+	// identify whether it is a unique match with < 50% overlap.
+	public boolean isOverlappingMatch(Match m, List<Match> matchesToPrint) {
+		
+		for(Match confirmedMatch : matchesToPrint) {
+			// -1 because contains will not return true if a pixel is on the edge of the rectangle
+			Rectangle r = new Rectangle(confirmedMatch.location.x-1,
+										confirmedMatch.location.y-1, 
+										confirmedMatch.patternHandler.getWidth()/2, 
+										confirmedMatch.patternHandler.getHeight()/2);
+			
+			return r.contains(m.location);
+		}
+		
+		return false;
 	}
 	
 	// Print out our final list of matches
