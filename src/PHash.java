@@ -1,6 +1,7 @@
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 
 /**
  * Used to obtain a 64-bit binary hash string based off of supplied Buffered Images
@@ -21,14 +22,8 @@ public class PHash {
 		img = resize(img);
 
 		// Reduce the image to grayscale
-		// ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-		// colorConvert.filter(img, img);
-
-		// Reduce the image to grayscale
-		BufferedImage image = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
-		Graphics g = image.getGraphics();  
-		g.drawImage(img, 0, 0, null);  
-		g.dispose(); 
+		ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+		colorConvert.filter(img, img);
 		
 		// Obtain the blue values for each pixel in a 32x32 img area
 		int[][] blueValues = new int[SIZE_32][SIZE_32];
