@@ -12,9 +12,9 @@ public class ComparisonThread implements Runnable {
 	/**
 	 * CONSTRUCTOR
 	 *  
-	 * @param pattern Pattern Image File
-	 * @param sources Source Image Files
-	 * @param index Thread Index
+	 * @param pattern -- Pattern Image File
+	 * @param sources -- Source Image Files
+	 * @param index   -- Thread Index
 	 */
 	public ComparisonThread(File pattern, ArrayList<File> sources) {		
 		/*

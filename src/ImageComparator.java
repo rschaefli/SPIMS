@@ -9,6 +9,13 @@ public class ImageComparator {
 	private ImageHandler pHandler; // Pattern Handler
 	private String patternHash;    // Pattern PHash String
 
+	/**
+	 * CONSTRUCTOR
+	 * 
+	 * @param patternHandler -- Pattern Handler
+	 * @param sourceHandler  -- Source Handler
+	 * @param patternHash    -- Pattern String Hash
+	 */
 	public ImageComparator(ImageHandler patternHandler, ImageHandler sourceHandler, String patternHash){
 		this.sHandler = sourceHandler;
 		this.pHandler = patternHandler;
@@ -32,7 +39,13 @@ public class ImageComparator {
 		matchManager.printMatches();
 	}
 
-	// Given the pHash values of all our potential matches, pick out our final matches
+	/**
+	 * Obtains a Match Manager which contains all of the valid matches 
+	 * 
+	 * @param potentialMatchManager -- Potential Match Manager 
+	 * 
+	 * @return a Match manager with all of the valid matches
+	 */
 	private MatchManager getMatches(PotentialMatchManager potentialMatchManager) {
 		MatchManager matchManager = new MatchManager();
 		boolean allExactMatches = true; // Keep batching while we have exact matches
@@ -40,9 +53,9 @@ public class ImageComparator {
 		// Get our first batch of potential matches
 		List<PotentialMatch> potentialMatches = potentialMatchManager.getNextBatch();
 
-		// Here we handle detecting an arbitrary number of exact matches
-		// As long as our best matches are exact matches, keep PHashing more potential matches
+		// Keep pHashing as long as our best matches are exact matches
 		while(allExactMatches && potentialMatches.size() > 0) {
+			
 			// Loop through our potential matches and check if they are matches
 			for(PotentialMatch pm : potentialMatches) {
 				int difference = PHash.getHammingDistance(patternHash, pm.getPHash());
@@ -50,6 +63,7 @@ public class ImageComparator {
 
 				// If this is a small pattern, we have already compared all pixels and can just add it
 				if(pHandler.isSmallImage()) {
+					
 					// If we are at the first index in the batch, add this match
 					// With low pixel counts, the first average color difference is the match
 					// even if the PHash is off

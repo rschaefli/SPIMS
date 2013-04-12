@@ -21,8 +21,8 @@ public class CornerManager {
      * 
      * Finds the potential top left corners on creation.
      * 
-     * @param patternImageHandler Pattern Image Handler
-     * @param sourceImageHandler  Source Image Handler
+     * @param patternImageHandler -- Pattern Image Handler
+     * @param sourceImageHandler  -- Source Image Handler
      */
     public CornerManager(ImageHandler patternImageHandler, ImageHandler sourceImageHandler) {
     	this.pHandler = patternImageHandler;
@@ -36,8 +36,9 @@ public class CornerManager {
      * 
      * NOTE: Corners must already be sorted at this point
      * 
-     * @param start Index to grab from
-     * @param howMany Number of corners to grab
+     * @param start   -- Index to grab from
+     * @param howMany -- Number of corners to grab
+     * 
      * @return List of corners from start to start+howMany
      */
     public List<Corner> getRangeOfTopLeftCorners(int start, int howMany) {
@@ -86,10 +87,10 @@ public class CornerManager {
 
     /**
      * Compares pixels and if the corner is a potential match, then add it to the list of potential corners
-     * @param x Potential corner x location
-     * @param y Potential corner y location
-     * @param cornerDiff Corner color difference
-     * @param bestDiff Current best corner color difference
+     * @param x          -- Potential corner x location
+     * @param y          -- Potential corner y location
+     * @param cornerDiff -- Corner color difference
+     * @param bestDiff   -- Current best corner color difference
      */
 	private void addIfPotentialCorner(int x, int y, ColorDifference cornerDiff, ColorDifference bestDiff) {
 
@@ -113,10 +114,10 @@ public class CornerManager {
 	 * Obtains the color difference of all our pattern image colors compared to 
 	 * their respective source image colors
 	 * 
-	 * @param cornerImageColors Corner pixel to color mapping
-	 * @param xOffset Pixel X offset from pattern to source
-	 * @param yOffset Pixel Y offset from pattern to source
-	 * @param bestDifference The current best color difference
+	 * @param cornerImageColors -- Corner pixel to color mapping
+	 * @param xOffset           -- Pixel X offset from pattern to source
+	 * @param yOffset           -- Pixel Y offset from pattern to source
+	 * @param bestDifference    -- The current best color difference
 	 *  
 	 * @return The color difference between the given top left corner pixel->color mapping
 	 *         and the current source location being checked

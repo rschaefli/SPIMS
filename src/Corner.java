@@ -11,9 +11,9 @@ public class Corner implements Comparable<Corner> {
     /**
      * CONSTRUCTOR
      * 
-     * @param point Top left location
-     * @param colorDifference Color difference between the pattern
-     *                        image and source image at this location
+     * @param point           -- Top left location
+     * @param colorDifference -- Color difference between the pattern
+     *                           image and source image at this location
      */
     public Corner(Point point, ColorDifference colorDifference) {
         this.point = point;

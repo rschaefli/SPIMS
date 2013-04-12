@@ -14,7 +14,7 @@ public class PotentialMatchManager {
 	/**
 	 * CONSTRUCTOR
 	 * 
-	 * @param cornerManager Corner Manager
+	 * @param cornerManager -- Corner Manager
 	 */
 	public PotentialMatchManager(CornerManager cornerManager) {
 		this.cornerManager = cornerManager;
@@ -51,10 +51,10 @@ public class PotentialMatchManager {
 	/**
 	 * Obtain a pHash of a sub-image from the source image
 	 * 
-	 * @param sImage  Source image
-	 * @param loc     Top left sub-image location
-	 * @param pWidth  Pattern width
-	 * @param pHeight Pattern height
+	 * @param sImage  -- Source image
+	 * @param loc     -- Top left sub-image location
+	 * @param pWidth  -- Pattern width
+	 * @param pHeight -- Pattern height
 	 * 
 	 * @return String pHash of sub-image
 	 */

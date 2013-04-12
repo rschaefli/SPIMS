@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * Contains the majority of constants used throughout the classes
+ */
 public class Constants {
 
 	// Set number of comparison threads to number of cores

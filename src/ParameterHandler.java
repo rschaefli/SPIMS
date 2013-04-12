@@ -6,15 +6,15 @@ import java.util.ArrayList;
  */
 public class ParameterHandler {
 
-	private ArrayList<File> patterns = new ArrayList<File>();
-	private ArrayList<File> sources = new ArrayList<File>();
+	private ArrayList<File> patterns = new ArrayList<File>(); // Pattern File Locations
+	private ArrayList<File> sources = new ArrayList<File>();  // Source File Locations
 
 	/**
 	 * CONSTRUCTOR
 	 *
 	 * Handles Input Parameter Validation
 	 *
-	 * @param args Input Parameters
+	 * @param args -- Input Parameters
 	 */
 	public ParameterHandler(String[] args) {
 		checkAllFlagsExist(args);
@@ -24,7 +24,7 @@ public class ParameterHandler {
 	/**
 	 * Do all of the necessary parameter flags exist?
 	 * 
-	 * @param args Parameters
+	 * @param args -- Parameters
 	 */
 	private void checkAllFlagsExist(String[] args) {
 		if (args.length != 4) {
@@ -46,7 +46,7 @@ public class ParameterHandler {
 	/**
 	 * Sets the pattern and source imagery files
 	 * 
-	 * @param args Parameters
+	 * @param args -- Parameters
 	 */
 	private void setImagery(String[] args) {
 		this.patterns = obtainImagery(args[1]);
@@ -56,7 +56,8 @@ public class ParameterHandler {
 	/**
 	 * Obtains imagery files from a given path location
 	 * 
-	 * @param location Imagery location
+	 * @param location -- Imagery location
+	 * 
 	 * @return ArrayList of Imagery files
 	 */
 	private ArrayList<File> obtainImagery(String location) {

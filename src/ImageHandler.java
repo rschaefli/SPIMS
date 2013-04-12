@@ -25,7 +25,7 @@ public class ImageHandler {
 	 *
 	 * Handles File Validation/Initializes Buffered Image
 	 *
-	 * @param imageFile Image File
+	 * @param imageFile -- Image File
 	 */
 	public ImageHandler(File imageFile) {
 		// Open Image Reading Streams

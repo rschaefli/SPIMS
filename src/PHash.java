@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
  */
 public class PHash {
 
-	private static final int SIZE_32 = 32; 
-	private static final int SIZE_8 = 8;
+	private static final int SIZE_32 = 32; // 32x32 Image 
+	private static final int SIZE_8 = 8;   // 8x8 Image
 
 	/**
 	 * Creates a 64-bit binary string based representing the given image

@@ -8,6 +8,9 @@ public class ColorDifference {
     private float difference; // sum of differences between red/green/blue values
     private int totalPixels;  // Total pixel colors compared
     
+    /**
+     * CONSTRUCTOR
+     */
     public ColorDifference() {
     	this.difference = 0;
         this.totalPixels = 0;
@@ -30,8 +33,8 @@ public class ColorDifference {
     /**
      * Add the color differences between two more colors to the existing differences
      * 
-     * @param c1 Color 1
-     * @param c2 Color 2
+     * @param c1 -- Color 1
+     * @param c2 -- Color 2
      */
     public void addColorDifference(Color c1, Color c2) {
     	int r1 = c1.getRed();
