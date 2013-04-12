@@ -7,65 +7,75 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+/**
+ * Finds the potential pattern corners locations within the source image
+ */
 public class CornerManager {
-	
-	private final static int PIXEL_COMPARISON_DEPTH = 3; // Note that we go down to 0, so 3 deep
-														 // actually means 4 on each corner
-	private final static int MAX_AVERAGE_COLOR_DIFFERENCE = 100; // Where to stop checking pixels
-    private final static int MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE = 50;
-	
-	private List<Corner> potentialTopLeftCorners;
-    private ImageHandler patternImageHandler;
-    private ImageHandler sourceImageHandler;
+		
+	private List<Corner> potentialTopLeftCorners; // Potential top left corners
+    private ImageHandler pHandler;                // Pattern Image Handler
+    private ImageHandler sHandler;                // Source Image Handler
     
+    /**
+     * CONSTRUCTOR
+     * 
+     * Finds the potential top left corners on creation.
+     * 
+     * @param patternImageHandler Pattern Image Handler
+     * @param sourceImageHandler  Source Image Handler
+     */
     public CornerManager(ImageHandler patternImageHandler, ImageHandler sourceImageHandler) {
-    	this.patternImageHandler = patternImageHandler;
-    	this.sourceImageHandler = sourceImageHandler;
-    	potentialTopLeftCorners = new ArrayList<Corner>();
-    	setPossibleCorners();
+    	this.pHandler = patternImageHandler;
+    	this.sHandler = sourceImageHandler;
+    	this.potentialTopLeftCorners = new ArrayList<Corner>();
+    	findPotentialCorners();
     }
     
-    // Get a range of top left corners from index start to start+howMany
-    // At this point, corners must already be sorted
+    /**
+     * Get a range of top left corners from the start index to the start+howMany index
+     * 
+     * NOTE: Corners must already be sorted at this point
+     * 
+     * @param start Index to grab from
+     * @param howMany Number of corners to grab
+     * @return List of corners from start to start+howMany
+     */
     public List<Corner> getRangeOfTopLeftCorners(int start, int howMany) {
     	if (start > potentialTopLeftCorners.size()) {
     		return new ArrayList<Corner>();
-    	}
-    	else if (start+howMany > potentialTopLeftCorners.size()) {
+    	} else if (start+howMany > potentialTopLeftCorners.size()) {
             return potentialTopLeftCorners.subList(start, potentialTopLeftCorners.size());
-        }
-        else {
+        } else {
             return potentialTopLeftCorners.subList(start, start+howMany);
         }
     }
     
-    // Sets all the possible corners that could be a match in the source image
-    private void setPossibleCorners() {
-    	BufferedImage sourceImage = sourceImageHandler.getImage();
+    /**
+     * Create a list consisting of all the possible corner matches within the source image
+     */
+    private void findPotentialCorners() {
+    	BufferedImage sImage = sHandler.getImage();
     	// Get the pixels from the pattern image we will use to identify potential corners
         HashMap<Point, Color> topLeftImageColors = getPixelColors();
         
         // Set up our best color difference so far to an initial (high) value
-    	ColorDifference bestColorDifferenceSoFar = new ColorDifference();
-    	bestColorDifferenceSoFar.addColorDifference(new Color(0,0,0), new Color(128,128,18));
+    	ColorDifference bestDifference = new ColorDifference();
+    	bestDifference.addColorDifference(new Color(0,0,0), new Color(128,128,18));
         
-        // Look through all the pixels in the source image to identify potential corners with
-        // the corners of our pattern image
-        for (int i = 0; i <= sourceImage.getWidth() - patternImageHandler.getWidth(); i++) {
-            for (int j = 0; j <= sourceImage.getHeight() - patternImageHandler.getHeight(); j++) {
+    	// Compare source image pixels to pattern image corners to identify potential locations
+        for (int x = 0; x <= sImage.getWidth() - pHandler.getWidth(); x++) {
+            for (int y = 0; y <= sImage.getHeight() - pHandler.getHeight(); y++) {
 
-            	// Get our color difference for this point
             	// Get the color difference for this potential corner
-        		ColorDifference currentColorDifference = getColorDifferenceForPotentialCorner(topLeftImageColors, i, j, bestColorDifferenceSoFar);
+        		ColorDifference colorDiff = getColorDifferenceForPotentialCorner(topLeftImageColors, x, y, bestDifference);
             	
             	// Add this point to our list of corners if it is a potential corner
-            	addIfPotentialCorner(i, j, currentColorDifference, bestColorDifferenceSoFar);
+            	addIfPotentialCorner(x, y, colorDiff, bestDifference);
             	
             	// Update our best color difference so far
-            	if (currentColorDifference.getAverageDifference() < bestColorDifferenceSoFar.getAverageDifference()) {
-            		bestColorDifferenceSoFar = currentColorDifference;
-            	}
-            	
+            	if (colorDiff.getAverageDifference() < bestDifference.getAverageDifference()) {
+            		bestDifference = colorDiff;
+            	}      	
             }
         }
         
@@ -74,31 +84,47 @@ public class CornerManager {
         Collections.sort(potentialTopLeftCorners);
     }
 
-    // Compare pixels and if this corner is a potential match then add it to corners
-    // Returns the color difference so we can keep track of the best color difference
-	private void addIfPotentialCorner(int i, int j, ColorDifference colorDifferenceForCorner, ColorDifference bestColorDifferenceSoFar) {
-		// Here we ensure we don't add too many potential corners
-		// Only add one when it is better than or equal to the best so far
-		boolean isPotentialCorner = (colorDifferenceForCorner.getAverageDifference() <= bestColorDifferenceSoFar.getAverageDifference());
+    /**
+     * Compares pixels and if the corner is a potential match, then add it to the list of potential corners
+     * @param x Potential corner x location
+     * @param y Potential corner y location
+     * @param cornerDiff Corner color difference
+     * @param bestDiff Current best corner color difference
+     */
+	private void addIfPotentialCorner(int x, int y, ColorDifference cornerDiff, ColorDifference bestDiff) {
 
-		// If we are comparing every single pixel (small images)
-		// we want to reduce the max average color difference we allow.
-		if(patternImageHandler.isSmallImage()) {
-			isPotentialCorner &= (colorDifferenceForCorner.getAverageDifference() < MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE); 
+		// Is a potential corner if it is better than or equal to the current best difference
+		boolean isPotentialCorner = (cornerDiff.getAverageDifference() <= bestDiff.getAverageDifference());
+
+		// Reduce the max average color difference on small image comparisons
+		if(pHandler.isSmallImage()) {
+			isPotentialCorner &= (cornerDiff.getAverageDifference() < Constants.MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE); 
 		} else {
-			isPotentialCorner &= (colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE); 
+			isPotentialCorner &= (cornerDiff.getAverageDifference() < Constants.MAX_AVERAGE_COLOR_DIFFERENCE); 
 		}
 		
-		// If we have a potential corner, add to result
+		// If we have a potential corner, add it to the list
         if (isPotentialCorner) {
-        	potentialTopLeftCorners.add(new Corner(new Point(i, j), colorDifferenceForCorner));
+        	potentialTopLeftCorners.add(new Corner(new Point(x, y), cornerDiff));
         }
 	}
 	
-	// Gets the color difference of all our pattern image colors compared to their
-	// respective source image colors
-	private ColorDifference getColorDifferenceForPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j, ColorDifference bestColorDifferenceSoFar) {
-		BufferedImage sourceImage = sourceImageHandler.getImage();
+	/**
+	 * Obtains the color difference of all our pattern image colors compared to 
+	 * their respective source image colors
+	 * 
+	 * @param cornerImageColors Corner pixel to color mapping
+	 * @param xOffset Pixel X offset from pattern to source
+	 * @param yOffset Pixel Y offset from pattern to source
+	 * @param bestDifference The current best color difference
+	 *  
+	 * @return The color difference between the given top left corner pixel->color mapping
+	 *         and the current source location being checked
+	 */
+	private ColorDifference getColorDifferenceForPotentialCorner(HashMap<Point, Color> cornerImageColors, 
+			int xOffset, int yOffset, ColorDifference bestDifference) {
+		
+		BufferedImage sourceImage = sHandler.getImage();
 		ColorDifference difference = new ColorDifference();
 		
 		// Loop through the pixels and compute the ColorDifference
@@ -106,12 +132,12 @@ public class CornerManager {
 		    Point p = entry.getKey();
 		    Color patternPixelColor = entry.getValue();
 		    
-		    Color sourcePixelColor = new Color(sourceImage.getRGB(p.x + i, p.y + j));
+		    Color sourcePixelColor = new Color(sourceImage.getRGB(p.x + xOffset, p.y + yOffset));
 		    
 		    difference.addColorDifference(patternPixelColor, sourcePixelColor);
 		    
 		    // If we ever breach the threshold, stop looking!
-		    if (difference.getAverageDifference() > bestColorDifferenceSoFar.getAverageDifference()) {
+		    if (difference.getAverageDifference() > bestDifference.getAverageDifference()) {
 		    	break;
 		    }
 		}
@@ -119,19 +145,23 @@ public class CornerManager {
 		return difference;
 	}
     
-    // This is used to elaborate on just comparing the top left pixel of sub images
-    // The goal is to get less potential corners in the source image by checking more than 1 pixel
-    // back on the left side of the second row.
-    // Get pixels along the diagonal of the pattern image
+	/**
+	 * Used to obtain the pixels along the diagonal of the pattern image.
+	 * 
+	 * Instead of just comparing the top left pixel of sub images, we grab less potential corners
+	 * in the source image by checking more than 1 pixel back on the left side of the second row
+	 * 
+	 * @return Mapping of pixel locations to colors
+	 */
     private HashMap<Point, Color> getPixelColors() {
         HashMap<Point, Color> result = new HashMap<Point, Color>();
-        BufferedImage image = patternImageHandler.getImage();
+        BufferedImage image = pHandler.getImage();
         int width = image.getWidth() - 1;
         int height = image.getHeight() - 1;
 
-        int depth = PIXEL_COMPARISON_DEPTH;
+        int depth = Constants.PIXEL_COMPARISON_DEPTH - 1; // Subtract 1 so we search by index
         // If depth is too big for this image, get all pixels from image
-        if(patternImageHandler.isSmallImage()) {
+        if(pHandler.isSmallImage()) {
         	for(int x=0;x<image.getWidth();x++){
         		for(int y=0;y<image.getHeight();y++) {
         			result.put(new Point(x,y), new Color(image.getRGB(x,y)));
@@ -159,11 +189,13 @@ public class CornerManager {
         return result;
     }
 
+	/** ---------- GETTERS ---------- */
+    
 	public ImageHandler getPatternImageHandler() {
-		return patternImageHandler;
+		return pHandler;
 	}
 
 	public ImageHandler getSourceImageHandler() {
-		return sourceImageHandler;
+		return sHandler;
 	}
 }

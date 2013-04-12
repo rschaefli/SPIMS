@@ -1,30 +1,35 @@
+import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 
 /**
  * Used to obtain a 64-bit binary hash string based off of supplied Buffered Images
  */
 public class PHash {
 
-	private final int SIZE_32 = 32; 
-	private final int SIZE_8 = 8;
+	private static final int SIZE_32 = 32; 
+	private static final int SIZE_8 = 8;
 
 	/**
 	 * Creates a 64-bit binary string based representing the given image
 	 * @param img Image to obtain a hash of
 	 * @return 64-bit binary string representing image
 	 */
-	public String getHash(BufferedImage img) {
+	public static String createHash(BufferedImage img) {
 
 		// Reduce the image size to a 32x32 to simplify the DCT (discrete cosine transformation) computation
 		img = resize(img);
 
 		// Reduce the image to grayscale
-		ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-		colorConvert.filter(img, img);
+		// ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+		// colorConvert.filter(img, img);
 
+		// Reduce the image to grayscale
+		BufferedImage image = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
+		Graphics g = image.getGraphics();  
+		g.drawImage(img, 0, 0, null);  
+		g.dispose(); 
+		
 		// Obtain the blue values for each pixel in a 32x32 img area
 		int[][] blueValues = new int[SIZE_32][SIZE_32];
 		for (int x = 0; x < img.getWidth(); x++) {
@@ -70,7 +75,7 @@ public class PHash {
 	 * @param f 32x32 2D float array representing a 32x32 image's pixel color values
 	 * @return DCT array
 	 */
-	private double[][] getDCT(int[][] f) {
+	private static double[][] getDCT(int[][] f) {
 
 		double[][] dctVals = new double[SIZE_32][SIZE_32];
 		
@@ -104,11 +109,30 @@ public class PHash {
 	 * @param image Image to resize
 	 * @return resized image
 	 */
-	private BufferedImage resize(BufferedImage image) {
+	private static BufferedImage resize(BufferedImage image) {
 		BufferedImage resizedImage = new BufferedImage(SIZE_32, SIZE_32, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = resizedImage.createGraphics();
 		g.drawImage(image, 0, 0, SIZE_32, SIZE_32, null);
 		g.dispose();
 		return resizedImage;
+	}
+	
+	/**
+	 * Obtain the difference between two pHashed strings
+	 * @param one Hashed String 1
+	 * @param two Hashed String 2
+	 * @return Number of differences between the two strings
+	 */
+	public static int getHammingDistance(String one, String two) {
+		if (one.length() != two.length()) {
+			return -1;
+		}
+		int counter = 0;
+		for (int i = 0; i < one.length(); i++) {
+			if (one.charAt(i) != two.charAt(i)) {
+				counter++;
+			}
+		}
+		return counter;
 	}
 }

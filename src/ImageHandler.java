@@ -1,11 +1,9 @@
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -15,19 +13,13 @@ import javax.imageio.stream.ImageInputStream;
 /**
  * Handles File to BufferedImage validation and conversion
  */
-@SuppressWarnings("serial")
 public class ImageHandler {
 	
 	private BufferedImage image = null;     // Handled Image
-	private boolean validImg = false;       // Is Handled Image Valid?
 	private String type = null;			    // Image Type			
 	private String name = "";				// Image Name
 	private boolean smallImage = false;		// Do we consider this a small image?
-	private final ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
-		add("gif"); 
-		add("jpeg");
-		add("png");
-	}};
+
 	/**
 	 * Constructor
 	 *
@@ -52,12 +44,11 @@ public class ImageHandler {
 				String fileType = reader.getFormatName().toLowerCase();
 
 				// Validate reader type
-				if (VALID_TYPES.contains(fileType)) {
+				if (Constants.VALID_TYPES.contains(fileType)) {
 					image = reader.read(0);
 					name = imageFile.getName();
-					validImg = true;
 					type = fileType;
-					smallImage = image.getHeight() * image.getWidth() < 64;
+					smallImage = image.getHeight() * image.getWidth() < Constants.SMALL_IMAGE_SIZE;
 				} else {
 					System.err.println("Invalid image type @ " + imageFile.getAbsolutePath());
 					System.exit(1);
@@ -80,29 +71,7 @@ public class ImageHandler {
 		}
 	}
 
-	public void convertToGreyScale() {		
-		BufferedImage gray = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-		Graphics2D g = gray.createGraphics();
-		g.drawImage(image, 0, 0, null);
-		g.dispose();
-		image = gray;
-	}
-
 	/** ---------- GETTERS AND SETTERS ---------- */
-
-	/**
-	 * Use this to verify that the image being handled is existent/valid before
-	 * using it
-	 *
-	 * @return Does this image handle contain a valid image?
-	 */
-	public boolean isValidImg() {
-		return validImg;
-	}
-
-	public void setValidImg(boolean validImg) {
-		this.validImg = validImg;
-	}
 
 	public BufferedImage getImage() {
 		return image;

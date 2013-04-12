@@ -8,9 +8,9 @@ public class ComparisonThread implements Runnable {
 
 	private ImageHandler patternImg = null;					 // Pattern Image
 	private ArrayList<File> sources = new ArrayList<File>(); // File paths for source imagery
-	
+
 	/**
-	 * Constructor
+	 * CONSTRUCTOR
 	 *  
 	 * @param pattern Pattern Image File
 	 * @param sources Source Image Files
@@ -25,28 +25,19 @@ public class ComparisonThread implements Runnable {
 		this.sources = sources; 
 		this.patternImg = new ImageHandler(pattern);
 	}
-	
+
 	/**
 	 * Begins the pattern image -> source imagery comparisons
 	 */
 	@Override
 	public void run() {
-		if(patternImg.isValidImg()) {
-	        runPHash();
-		}
-	}
-	
-	private void runPHash() {
-		PHash imageHash = new PHash();   
-        String patternHash = imageHash.getHash(patternImg.getImage());
-     
+		String patternHash = PHash.createHash(patternImg.getImage());
+
 		for(File image : sources) {
 			ImageHandler sourceImg = new ImageHandler(image);
-			
-			if(sourceImg.isValidImg()) {
-				ImageComparator ic = new ImageComparator(patternImg, sourceImg, patternHash);
-				ic.compare();  
-			}
+			ImageComparator ic = new ImageComparator(patternImg, sourceImg, patternHash);
+			ic.compare();  
 		}
 	}
+
 }

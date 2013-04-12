@@ -4,26 +4,13 @@ import java.util.ArrayList;
 /**
  * Handles Input Parameter Validation
  */
-@SuppressWarnings("serial")
 public class ParameterHandler {
 
 	private ArrayList<File> patterns = new ArrayList<File>();
 	private ArrayList<File> sources = new ArrayList<File>();
 
-	private ArrayList<String> VALID_PATTERN_FLAGS = new ArrayList<String>() {{
-		add("-p");
-		add("-pdir");
-		add("--pdir");
-	}};
-
-	private ArrayList<String> VALID_SOURCE_FLAGS = new ArrayList<String>() {{
-		add("-s");
-		add("-sdir");
-		add("--sdir");
-	}};
-
 	/**
-	 * Constructor
+	 * CONSTRUCTOR
 	 *
 	 * Handles Input Parameter Validation
 	 *
@@ -45,12 +32,12 @@ public class ParameterHandler {
 			System.exit(1);
 		}
 
-		if(!VALID_PATTERN_FLAGS.contains(args[0])) {
+		if(!Constants.VALID_PATTERN_FLAGS.contains(args[0])) {
 			System.err.println("ERROR - Invalid Pattern Flag");
 			System.exit(1);
 		}
 
-		if(!VALID_SOURCE_FLAGS.contains(args[2])) {
+		if(!Constants.VALID_SOURCE_FLAGS.contains(args[2])) {
 			System.err.println("ERROR - Invalid Source Flag");
 			System.exit(1);
 		}

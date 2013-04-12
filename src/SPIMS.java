@@ -3,10 +3,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Senior Project Image Matching Software
+ */
 public class SPIMS {
-
-	// Set number of comparison threads to number of cores
-	private final static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 	
 	public static void main(String[] args) {
 		
@@ -15,7 +15,8 @@ public class SPIMS {
 		ArrayList<File> patternImgs = ph.getPatterns();
 		ArrayList<File> sourceImgs = ph.getSources();
 
-		ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+		// Kick off a thread pool of comparisons
+		ExecutorService executor = Executors.newFixedThreadPool(Constants.NUM_THREADS);
 		for(File pattern : patternImgs) {
 			ComparisonThread ct = new ComparisonThread(pattern, sourceImgs);
 			executor.execute(ct);

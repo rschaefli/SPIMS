@@ -2,8 +2,6 @@ import java.awt.Point;
 
 public class Match {
 	
-	private final static int HIGHEST_ACCEPTABLE_DIFFERENCE = 5;
-	
 	public ImageHandler patternHandler;
 	public ImageHandler sourceHandler;
 	public Point location;
@@ -17,7 +15,7 @@ public class Match {
 	}
 	
 	public boolean isMatch() {
-		return difference < HIGHEST_ACCEPTABLE_DIFFERENCE;
+		return difference < Constants.HIGHEST_ACCEPTABLE_DIFFERENCE;
 	}
 	
 	public boolean isExactMatch() {
