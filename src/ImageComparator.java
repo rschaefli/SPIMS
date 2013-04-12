@@ -43,6 +43,8 @@ public class ImageComparator {
         	for(PotentialMatch pm : potentialMatches) {
         		int difference = getHammingDistance(patternHash, pm.getPHash());
         		
+        		//System.out.println("Point " + pm.getLocation().x + "," + pm.getLocation().y + " has PHash of " + difference);
+        		
         		// Is this a potential match a match?
         		Match m = new Match(patternHandler, sourceHandler, pm.getLocation(), difference);
                 if(m.isMatch()) {

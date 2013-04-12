@@ -5,7 +5,7 @@ public class ColorDifference {
     private int totalPixels;
     
     public ColorDifference() {
-        this.totalPixels = 1;
+        this.totalPixels = 0;
     }
     
     public float getAverageDifference() {
@@ -25,7 +25,7 @@ public class ColorDifference {
         int b2 = c2.getBlue();
         int b = Math.abs(b2 - b1);
         
-        this.difference += Math.sqrt(Math.pow(r, 2) + Math.pow(g, 2) + Math.pow(b, 2));
+        this.difference += (r+g+b);
         this.totalPixels += 1;
     }
 }
