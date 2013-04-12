@@ -54,8 +54,12 @@ public class CornerManager {
         for (int i = 0; i <= sourceImage.getWidth() - patternImageHandler.getWidth(); i++) {
             for (int j = 0; j <= sourceImage.getHeight() - patternImageHandler.getHeight(); j++) {
 
+            	// Get our color difference for this point
+            	// Get the color difference for this potential corner
+        		ColorDifference currentColorDifference = getColorDifferenceForPotentialCorner(topLeftImageColors, i, j, bestColorDifferenceSoFar);
+            	
             	// Add this point to our list of corners if it is a potential corner
-            	ColorDifference currentColorDifference = addIfPotentialCorner(topLeftImageColors, i, j, bestColorDifferenceSoFar);
+            	addIfPotentialCorner(i, j, currentColorDifference, bestColorDifferenceSoFar);
             	
             	// Update our best color difference so far
             	if (currentColorDifference.getAverageDifference() < bestColorDifferenceSoFar.getAverageDifference()) {
@@ -72,30 +76,23 @@ public class CornerManager {
 
     // Compare pixels and if this corner is a potential match then add it to corners
     // Returns the color difference so we can keep track of the best color difference
-	private ColorDifference addIfPotentialCorner(HashMap<Point, Color> cornerImageColors, int i, int j, ColorDifference bestColorDifferenceSoFar) {
-		// Get the color difference for this potential corner
-		ColorDifference colorDifferenceForCorner = getColorDifferenceForPotentialCorner(cornerImageColors, i, j, bestColorDifferenceSoFar);
-		
+	private void addIfPotentialCorner(int i, int j, ColorDifference colorDifferenceForCorner, ColorDifference bestColorDifferenceSoFar) {
 		// Here we ensure we don't add too many potential corners
 		// Only add one when it is better than or equal to the best so far
 		boolean isPotentialCorner = (colorDifferenceForCorner.getAverageDifference() <= bestColorDifferenceSoFar.getAverageDifference());
 
 		// If we are comparing every single pixel (small images)
 		// we want to reduce the max average color difference we allow.
-		if(cornerImageColors.size() == patternImageHandler.getHeight() * patternImageHandler.getWidth()) {
-			isPotentialCorner = isPotentialCorner && 
-								(colorDifferenceForCorner.getAverageDifference() < MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE); 
+		if(patternImageHandler.isSmallImage()) {
+			isPotentialCorner &= (colorDifferenceForCorner.getAverageDifference() < MAX_SMALL_IMAGE_AVERAGE_COLOR_DIFFERENCE); 
 		} else {
-			isPotentialCorner = isPotentialCorner &&
-								(colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE); 
+			isPotentialCorner &= (colorDifferenceForCorner.getAverageDifference() < MAX_AVERAGE_COLOR_DIFFERENCE); 
 		}
 		
 		// If we have a potential corner, add to result
         if (isPotentialCorner) {
         	potentialTopLeftCorners.add(new Corner(new Point(i, j), colorDifferenceForCorner));
         }
-        
-        return colorDifferenceForCorner;
 	}
 	
 	// Gets the color difference of all our pattern image colors compared to their

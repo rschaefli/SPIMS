@@ -19,4 +19,8 @@ public class Match {
 	public boolean isMatch() {
 		return difference < HIGHEST_ACCEPTABLE_DIFFERENCE;
 	}
+	
+	public boolean isExactMatch() {
+		return difference == 0;
+	}
 }

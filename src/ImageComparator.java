@@ -42,23 +42,25 @@ public class ImageComparator {
         	// Loop through our potential matches and check if they are matches
         	for(PotentialMatch pm : potentialMatches) {
         		int difference = getHammingDistance(patternHash, pm.getPHash());
-        		
-        		//System.out.println("Point " + pm.getLocation().x + "," + pm.getLocation().y + " has PHash of " + difference);
-        		
-        		// Is this a potential match a match?
         		Match m = new Match(patternHandler, sourceHandler, pm.getLocation(), difference);
+        		
         		// If this is a small pattern, we have already compared all pixels and can just add it
                 if(patternHandler.isSmallImage()) {
-                	matchManager.add(m);
+                	// If we are at the first index in the batch, add this match
+                	// With low pixel counts, the first average color difference is the match
+                	// even if the PHash is off
+                	if(potentialMatches.indexOf(pm) == 0) {
+                		matchManager.add(m);
+                	} else if(m.isExactMatch()) {
+                		matchManager.add(m);
+                	}
                 } else if(m.isMatch()) {
                 	matchManager.add(m);
                 }
                 
                 // Keep track of whether we have all exact matches or not
-                allExactMatches &= (difference == 0);
+                allExactMatches &= (m.isExactMatch());
         	}
-        	
-        	//System.out.println("---------------------");
         	
         	// Get the next batch of potential matches if we had all exact matches
         	if(allExactMatches) {

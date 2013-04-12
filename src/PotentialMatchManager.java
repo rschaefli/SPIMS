@@ -25,7 +25,7 @@ public class PotentialMatchManager {
 															topLeft.getPoint(),
 															cornerManager.getPatternImageHandler().getImage().getWidth(),
 															cornerManager.getPatternImageHandler().getImage().getHeight());
-
+			
 			potentialMatches.add(new PotentialMatch(topLeft.getPoint(),
 													cornerManager.getPatternImageHandler().getImage().getWidth(),
 													cornerManager.getPatternImageHandler().getImage().getHeight(),
