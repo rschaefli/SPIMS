@@ -17,11 +17,12 @@ import javax.imageio.stream.ImageInputStream;
  */
 @SuppressWarnings("serial")
 public class ImageHandler {
-
+	
 	private BufferedImage image = null;     // Handled Image
 	private boolean validImg = false;       // Is Handled Image Valid?
 	private String type = null;			    // Image Type			
 	private String name = "";				// Image Name
+	private boolean smallImage = false;		// Do we consider this a small image?
 	private final ArrayList<String> VALID_TYPES = new ArrayList<String>() {{
 		add("gif"); 
 		add("jpeg");
@@ -56,6 +57,7 @@ public class ImageHandler {
 					name = imageFile.getName();
 					validImg = true;
 					type = fileType;
+					smallImage = image.getHeight() * image.getWidth() < 64;
 				} else {
 					System.err.println("Invalid image type @ " + imageFile.getAbsolutePath());
 					System.exit(1);
@@ -132,5 +134,9 @@ public class ImageHandler {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public boolean isSmallImage() {
+		return smallImage;
 	}
 }

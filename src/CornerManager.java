@@ -134,8 +134,7 @@ public class CornerManager {
 
         int depth = PIXEL_COMPARISON_DEPTH;
         // If depth is too big for this image, get all pixels from image
-        if(image.getWidth() < PIXEL_COMPARISON_DEPTH * 2 ||
-           image.getHeight() < PIXEL_COMPARISON_DEPTH * 2) {
+        if(patternImageHandler.isSmallImage()) {
         	for(int x=0;x<image.getWidth();x++){
         		for(int y=0;y<image.getHeight();y++) {
         			result.put(new Point(x,y), new Color(image.getRGB(x,y)));
