@@ -33,9 +33,9 @@ public class Constants {
 	}};
 	
 	// The number of pixels per corner that are compared
-	public static final int PIXEL_COMPARISON_DEPTH = 4; 
+	public static final int PIXEL_COMPARISON_DEPTH = 15; 
 	
-	// Where to stop checking for additional pixel
+	// Where to stop checking for additional pixels
 	public static final int MAX_AVERAGE_COLOR_DIFFERENCE = 100;
 	
 	// The maximum of color differences to check for when dealing with small imagery
